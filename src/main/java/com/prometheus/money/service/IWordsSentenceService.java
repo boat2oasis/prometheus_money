@@ -1,7 +1,7 @@
-package com.prometheus.prometheus.service;
+package com.prometheus.money.service;
 
-import com.prometheus.prometheus.entity.WordsSentence;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.prometheus.money.entity.WordsSentence;
 
 /**
  * <p>

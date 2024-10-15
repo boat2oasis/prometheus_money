@@ -1,7 +1,7 @@
-package com.prometheus.prometheus.mapper;
+package com.prometheus.money.mapper;
 
-import com.prometheus.prometheus.entity.WordsSentence;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.prometheus.money.entity.WordsSentence;
 
 /**
  * <p>

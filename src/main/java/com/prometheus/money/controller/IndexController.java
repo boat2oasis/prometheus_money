@@ -1,4 +1,4 @@
-package com.prometheus.prometheus.controller;
+package com.prometheus.money.controller;
 
 import javax.sql.DataSource;
 
@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.prometheus.prometheus.entity.WordsSentence;
-import com.prometheus.prometheus.mapper.WordsSentenceMapper;
-import com.prometheus.prometheus.res.Res;
+import com.prometheus.money.entity.WordsSentence;
+import com.prometheus.money.mapper.WordsSentenceMapper;
+import com.prometheus.money.res.Res;
 import com.zaxxer.hikari.HikariDataSource;
 
 @RestController

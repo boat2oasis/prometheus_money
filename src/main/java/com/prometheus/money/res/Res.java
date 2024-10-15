@@ -1,4 +1,4 @@
-package com.prometheus.prometheus.res;
+package com.prometheus.money.res;
 
 public class Res<T> {
 	private int status; // 响应状态码

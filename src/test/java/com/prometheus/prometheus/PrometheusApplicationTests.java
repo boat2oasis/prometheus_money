@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.prometheus.prometheus.entity.WordsSentence;
-import com.prometheus.prometheus.mapper.WordsSentenceMapper;
+import com.prometheus.money.entity.WordsSentence;
+import com.prometheus.money.mapper.WordsSentenceMapper;
 import com.zaxxer.hikari.HikariDataSource;
 
 @SpringBootTest

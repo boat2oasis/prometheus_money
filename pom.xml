@@ -12,7 +12,7 @@
 	<groupId>com.prometheus </groupId>
 	<artifactId>prometheus </artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>prometheus </name>
+	<name>prometheus_money </name>
 	<description>prometheus </description>
 	<url />
 	<licenses>

@@ -1,4 +1,4 @@
-package com.prometheus.prometheus.generator;
+package com.prometheus.money.generator;
 
 import java.nio.file.Paths;
 

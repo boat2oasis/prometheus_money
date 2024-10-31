@@ -18,11 +18,14 @@ public class CodeGenerator {
 				.globalConfig(builder -> builder.author("Heisenberg")
 						.outputDir(Paths.get(System.getProperty("user.dir")) + "/src/main/java")
 						.commentDate("yyyy-MM-dd"))
-				.packageConfig(builder -> builder.parent("com.prometheus.prometheus").entity("entity").mapper("mapper")
+				.packageConfig(builder -> builder.parent("com.prometheus.money").entity("entity").mapper("mapper")
 						.service("service").serviceImpl("service.impl").xml("mapper.xml"))
 				// 添加表名称
-				.strategyConfig((scanner, builder) -> builder.addInclude("words_sentence").entityBuilder().enableLombok()
-
+				.strategyConfig((scanner, builder) -> builder.addInclude("life_things")
+						.entityBuilder()
+						.enableLombok()
+						.enableFileOverride()
+						.controllerBuilder().enableRestStyle()
 						.build())
 				.templateEngine(new FreemarkerTemplateEngine()).execute();
 	}

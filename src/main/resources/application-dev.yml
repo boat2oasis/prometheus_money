@@ -1,8 +1,12 @@
 spring:
   datasource:
+    #url: jdbc:mysql://127.0.0.1:3306/account?useSSL=false&serverTimezone=UTC
+    #username: root
+    #password: Aini2025nian
     url: jdbc:mysql://localhost:3306/english_learning?useSSL=false&serverTimezone=UTC
     username: root
     password: root2024_2025
+    
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       minimum-idle: 5              # 最小空闲连接数
@@ -10,3 +14,9 @@ spring:
       idle-timeout: 300000          # 空闲超时5分钟
       max-lifetime: 1200000         # 最大存活20分钟
       connection-timeout: 30000     # 连接超时30秒
+  jackson:
+    date-format: yyyy-MM-dd
+    
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.prometheus.money.mapper.SpentInformationMapper">
+ <select id="getSpentInfo" resultType="com.prometheus.money.entity.transfer.vo.SpentInformationVo">
+        SELECT spent_date AS spentDate, 
+               SUM(pricees) AS pricees, 
+               SUM(quantity) AS quantity,
+               SUM(could_save) AS couldSave
+        FROM spent_information
+        GROUP BY spent_date
+        ORDER BY spent_date DESC
+    </select>
+    
+     <select id="getTotalSpent" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(price), 0)
+        FROM spent_information
+        WHERE spent_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+    
+    
+    <select id="getCouldSave" resultType="java.math.BigDecimal">
+         SELECT IFNULL(SUM(could_save), 0) from spent_information
+         WHERE spent_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+    
+    
+    <select id="getSumPriceByUsedFor" resultType="com.prometheus.money.entity.transfer.vo.PriceByUsedForVo">
+        SELECT used_for, SUM(pricees) AS pricees
+        FROM spent_information
+        GROUP BY used_for
+    </select>
+    
+    <select id="getSumPriceByCategory" resultType="com.prometheus.money.entity.transfer.vo.PriceByCategoryVo">
+         SELECT category, SUM(pricees) AS pricees
+	     FROM spent_information
+	     GROUP BY category
+    </select>
+    
+    
+</mapper>

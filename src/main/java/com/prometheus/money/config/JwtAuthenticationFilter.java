@@ -1,5 +1,8 @@
 package com.prometheus.money.config;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,13 +14,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.prometheus.money.auth.CustomUserDetailsService;
 
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -34,6 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
              {
 
     	try {
+    		String url = request.getRequestURL().toString(); // 获取完整的请求 URL
+            System.out.println("Request URL: " + url); // 打印 URL
         String authorizationHeader = request.getHeader("Authorization");
         System.out.println("==================="+authorizationHeader+"===================");
         String jwt = null;

@@ -4,7 +4,6 @@
  <select id="getSpentInfo" resultType="com.prometheus.money.entity.transfer.vo.SpentInformationVo">
         SELECT spent_date AS spentDate, 
                SUM(pricees) AS pricees, 
-               SUM(quantity) AS quantity,
                SUM(could_save) AS couldSave
         FROM spent_information
         GROUP BY spent_date
@@ -12,7 +11,7 @@
     </select>
     
      <select id="getTotalSpent" resultType="java.math.BigDecimal">
-        SELECT IFNULL(SUM(price), 0)
+        SELECT IFNULL(SUM(pricees), 0)
         FROM spent_information
         WHERE spent_date BETWEEN #{startDate} AND #{endDate}
     </select>
@@ -27,7 +26,7 @@
     <select id="getSumPriceByUsedFor" resultType="com.prometheus.money.entity.transfer.vo.PriceByUsedForVo">
         SELECT used_for, SUM(pricees) AS pricees
         FROM spent_information
-        GROUP BY used_for
+        GROUP BY used_for order by pricees desc
     </select>
     
     <select id="getSumPriceByCategory" resultType="com.prometheus.money.entity.transfer.vo.PriceByCategoryVo">

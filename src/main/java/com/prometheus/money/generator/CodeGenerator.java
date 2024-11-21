@@ -21,7 +21,7 @@ public class CodeGenerator {
 				.packageConfig(builder -> builder.parent("com.prometheus.money").entity("entity").mapper("mapper")
 						.service("service").serviceImpl("service.impl").xml("mapper.xml"))
 				// 添加表名称
-				.strategyConfig((scanner, builder) -> builder.addInclude("life_things")
+				.strategyConfig((scanner, builder) -> builder.addInclude("stock_information")
 						.entityBuilder()
 						.enableLombok()
 						.enableFileOverride()

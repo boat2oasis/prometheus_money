@@ -1,7 +1,7 @@
 package com.prometheus.money.service;
 
+import com.prometheus.money.entity.Sentences;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.prometheus.money.entity.WordsSentence;
 
 /**
  * <p>
@@ -9,8 +9,8 @@ import com.prometheus.money.entity.WordsSentence;
  * </p>
  *
  * @author Heisenberg
- * @since 2024-10-13
+ * @since 2024-11-04
  */
-public interface IWordsSentenceService extends IService<WordsSentence> {
+public interface ISentencesService extends IService<Sentences> {
 
 }

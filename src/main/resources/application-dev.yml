@@ -16,7 +16,10 @@ spring:
       connection-timeout: 30000     # 连接超时30秒
   jackson:
     date-format: yyyy-MM-dd
-    
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/monthly-budget
+
 #mybatis-plus:
 #  configuration:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

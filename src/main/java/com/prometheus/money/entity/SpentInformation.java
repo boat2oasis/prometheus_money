@@ -32,9 +32,6 @@ public class SpentInformation implements Serializable {
 
     private String productServiceName;
 
-    private BigDecimal price;
-
-    private Integer quantity;
 
     private BigDecimal pricees;
 
@@ -42,13 +39,10 @@ public class SpentInformation implements Serializable {
 
     private LocalDateTime createAt;
 
-    private Integer category;
 
     private Integer usedFor;
     
     private Integer accountId;
-    
-    private Integer necessary;
     
     private BigDecimal couldSave;
 }

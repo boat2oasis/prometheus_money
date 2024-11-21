@@ -1,15 +1,15 @@
 package com.prometheus.money.res;
 
 public class Res<T> {
-	private int status; // 响应状态码
+	private int code; // 响应状态码
 	private String message; // 响应消息
 	private T data; // 响应数据（泛型，可以是任意类型）
 
-	private static final int SUCCESS = 200;
-	private static final int FAIL = 500;
+	private static final int SUCCESS = 0;
+	private static final int FAIL = 1;
 
 	public Res(int status, String message, T data) {
-		this.status = status;
+		this.code = status;
 		this.message = message;
 		this.data = data;
 	}
@@ -25,12 +25,12 @@ public class Res<T> {
 	}
 
 	// Getter和Setter方法
-	public int getStatus() {
-		return status;
+	public int getCode() {
+		return code;
 	}
 
-	public void setStatus(int status) {
-		this.status = status;
+	public void setCode(int status) {
+		this.code = status;
 	}
 
 	public String getMessage() {
@@ -52,6 +52,6 @@ public class Res<T> {
 	// 重写toString方法
 	@Override
 	public String toString() {
-		return "Res{" + "status=" + status + ", message='" + message + '\'' + ", data=" + data + '}';
+		return "Res{" + "status=" + code + ", message='" + message + '\'' + ", data=" + data + '}';
 	}
 }

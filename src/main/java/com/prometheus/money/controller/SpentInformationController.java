@@ -23,8 +23,6 @@ import com.prometheus.money.entity.SpentInformation;
 import com.prometheus.money.entity.transfer.re.SpentInformationRe;
 import com.prometheus.money.entity.transfer.vo.SpentInformationVo;
 import com.prometheus.money.entity.transfer.vo.TreeSpentInformation;
-import com.prometheus.money.enums.NecessaryEnum;
-import com.prometheus.money.enums.ProductCategoryEnum;
 import com.prometheus.money.enums.ProductPurposeEnum;
 import com.prometheus.money.mapper.FinancialAccountsMapper;
 import com.prometheus.money.mapper.SpentInformationMapper;
@@ -112,14 +110,12 @@ public class SpentInformationController {
 			newItem.setToStringSpentDate(item.getSpentDate().withZoneSameInstant(ZoneId.of("Asia/Shanghai")).format(formatter).substring(5));
 			
 			newItem.setUsedForName(ProductPurposeEnum.getValueByCode(item.getUsedFor()));
-			newItem.setCategoryName(ProductCategoryEnum.getValueByCode(item.getCategory()));
 			BeanUtils.copyProperties(item, newItem);
 			SpentInformationVo newItens =new SpentInformationVo();
 			BeanUtils.copyProperties(newItem, newItens);
 			newItens.setType(1);
 			newItens.setOperation(1);
 			newItens.setAccountName(accountIdToAccountNameMap.get(newItens.getAccountId()));
-			newItens.setNecessaryName(NecessaryEnum.getValueByCode(newItens.getNecessary()));
 			resultMap.get(item.getSpentDate()).getChildren().add(newItens);
 		}
 		return Res.success(resultList);

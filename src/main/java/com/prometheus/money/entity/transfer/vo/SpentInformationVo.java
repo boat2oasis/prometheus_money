@@ -20,18 +20,13 @@ public class SpentInformationVo {
 	    private Integer id;
 
 	    private String productServiceName;
-
-	    private BigDecimal price;
-
-	    private Integer quantity;
-
+	    
 	    private BigDecimal pricees;
 	    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
 	    private ZonedDateTime spentDate;
 
 	    private LocalDateTime createAt;
 
-	    private String categoryName;
 
 	    private String usedForName;
 	    
@@ -41,9 +36,6 @@ public class SpentInformationVo {
 	    
 	    private String accountName;
 	    
-	    private Integer necessary;
-	    
-	    private String necessaryName;
 	    
 	    private BigDecimal couldSave;
 	    

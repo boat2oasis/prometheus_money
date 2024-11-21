@@ -30,10 +30,6 @@ public class SpentInformationRe implements Serializable {
 
 	private String productServiceName;
 
-	private BigDecimal price;
-
-	private Integer quantity;
-
 	private BigDecimal pricees;
 
 	private ZonedDateTime spentDate;

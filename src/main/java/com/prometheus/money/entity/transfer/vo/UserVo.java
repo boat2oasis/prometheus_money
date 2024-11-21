@@ -8,4 +8,7 @@ import lombok.Setter;
 public class UserVo {
 	private  String username;
 	private String password;
+	private Boolean captcha;
+	private String selectAccount;
+	
 }

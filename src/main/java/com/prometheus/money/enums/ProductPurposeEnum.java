@@ -1,10 +1,10 @@
 package com.prometheus.money.enums;
 
 public enum ProductPurposeEnum {
-    吃(1, "吃"),               // Eating
-    喝(2, "喝"),               // Drinking
+    吃(1, "食物"),               // Eating
+    喝(2, "饮水"),               // Drinking
     住(3, "用"),               // Housing               // Utility
-    行(4, "行"),               // Transportation
+    行(4, "交通"),               // Transportation
     话费网费(5, "话费网费"),    // Phone and Internet Bills
     水费(6, "水费"),           // Rent
     电费(7, "电费"),           // Water Bill

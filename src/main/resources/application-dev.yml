@@ -21,5 +21,9 @@ spring:
       uri: mongodb://localhost:27017/monthly-budget
 
 #mybatis-plus:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  #configuration:
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB

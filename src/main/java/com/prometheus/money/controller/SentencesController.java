@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.prometheus.money.entity.Sentences;
 import com.prometheus.money.mapper.SentencesMapper;
 import com.prometheus.money.res.Res;
@@ -30,22 +31,14 @@ public class SentencesController {
 	@Autowired
 	private SentencesMapper sentencesMapper;
 	@GetMapping("/list")
-	public Res<List<Sentences>> list() {
+	public Res<Page<Sentences>> list() {
+		Page<Sentences> pages = new Page<Sentences>();
+		pages.setCurrent(1);
+		pages.setPages(100);
 		LambdaQueryWrapper<Sentences> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.orderByDesc(Sentences::getCreatedAt);
-		List<Sentences> resultList = sentencesMapper.selectList(queryWrapper);
 		
-
-		/*
-		int i=0;
-		for(Sentences result:resultList) {
-			result.setCreatedAt(LocalDateTime.now().plusSeconds(-1000 + i));
-			i++;
-			//sentencesMapper.updateById(resultList);
-		}
-		sentencesMapper.updateById(resultList);
-		*/
-		
+		Page<Sentences> resultList = sentencesMapper.selectPage(pages,queryWrapper);
 		return Res.success(resultList);
 	}
 	

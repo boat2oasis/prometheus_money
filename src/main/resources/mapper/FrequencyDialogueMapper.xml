@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.prometheus.money.mapper.FrequencyDialogueMapper">
+  <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO frequency_dialogue
+        (frequency_id, series, season, episode, chinese, sentence, review)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.frequencyId}, #{item.series}, #{item.season}, #{item.episode}, 
+             #{item.chinese}, #{item.sentence}, #{item.review})
+        </foreach>
+    </insert>
+
+</mapper>

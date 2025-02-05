@@ -40,7 +40,7 @@ public class DialogueController {
 		//Page<Dialogue> pageRequest = new Page<>(page, size);
 		
 		Page<FrequencyDialogue> pages = new Page<FrequencyDialogue>();
-		pages.setCurrent(dialogueRe.getCurrent());
+		pages.setCurrent(dialogueRe.getCurrent()+1);
 		pages.setSize(50);
 		String key = dialogueRe.getKey();
 	

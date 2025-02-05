@@ -1,5 +1,6 @@
 package com.prometheus.prometheus;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,13 +20,19 @@ import com.prometheus.money.entity.Dialogue;
 import com.prometheus.money.entity.Enwords;
 import com.prometheus.money.entity.Frequency;
 import com.prometheus.money.entity.FrequencyDialogue;
+import com.prometheus.money.entity.Similarity;
 import com.prometheus.money.mapper.FrequencyDialogueMapper;
 import com.prometheus.money.mapper.FrequencyMapper;
+import com.prometheus.money.mapper.SimilarityMapper;
 import com.prometheus.money.service.ICocaService;
 import com.prometheus.money.service.IDialogueService;
 import com.prometheus.money.service.IEnwordsService;
 import com.prometheus.money.service.IFrequencyDialogueService;
 import com.prometheus.money.service.IFrequencyService;
+import com.prometheus.money.service.ISimilarityService;
+
+import info.debatty.java.stringsimilarity.JaroWinkler;
+import info.debatty.java.stringsimilarity.Levenshtein;
 
 @SpringBootTest(classes = PrometheusMoneyApplication.class)
 @ActiveProfiles("dev")
@@ -44,6 +51,10 @@ public class FrequencyTest {
 	private FrequencyMapper frequencyMapper;
 	@Autowired
 	private FrequencyDialogueMapper frequencyDialogueMapper;
+	@Autowired
+	private ISimilarityService similarityService;
+	@Autowired
+	private SimilarityMapper similarityMapper;
 
 	@Test
 	void Dothing() {
@@ -79,6 +90,52 @@ public class FrequencyTest {
 		}
 		//frequencyDialogueMapper.batchInsert(batchInsert);
 	}
+	
+	
+	
+	@Test
+	void similarity() {
+		List<Frequency> frequencyList = frequencyService.list();
+		JaroWinkler jw = new JaroWinkler();
+		Levenshtein levenshtein = new Levenshtein();
+		List<Similarity> similarityList = new ArrayList<>();
+		for (Frequency frequency : frequencyList) {
+			System.out.println(frequency.getId());
+			System.out.println("==================================");
+			String sourceWord = frequency.getWord();
+			System.out.println(sourceWord);
+			for (Frequency frequencyWord : frequencyList) {
+				String targetWord = frequencyWord.getWord();
+				
+				double similarityRate = jw.similarity(sourceWord,targetWord);
+				double distance = levenshtein.distance(targetWord, sourceWord);
+				Double d =  Double.valueOf(distance);
+				d.intValue();
+				if(similarityRate>0.9 && similarityRate != 1 && d.intValue()<=sourceWord.length()) {
+					Similarity similarity = new Similarity();
+					similarity.setCoca(frequencyWord.getCoca());
+					similarity.setFrequency(frequencyWord.getFrequency());
+					similarity.setFrequencyId(frequency.getId());
+					//similarity.setId(null);
+					similarity.setLevenshtein(new BigDecimal(distance));
+					similarity.setSimilarity(new BigDecimal(similarityRate));
+					similarity.setSimilarityWord(frequencyWord.getWord());
+					similarityList.add(similarity);
+					if(similarityList.size()>=5000){
+						similarityMapper.insertBatch(similarityList);
+						similarityList = new ArrayList<>();
+					}
+					System.out.print(targetWord+";");
+				}
+			}
+			//System.out.println("==================================");
+		}
+		similarityMapper.insertBatch(similarityList);
+	}
+	
+	
+	
+	
 
 	@Test
 	void contextLoads() {

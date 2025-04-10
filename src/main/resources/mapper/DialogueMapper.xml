@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.prometheus.money.mapper.DialogueMapper">
+<!-- Batch Insert -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO dialogue (series, season, episode, chinese, sentence, review)
+        VALUES
+        <foreach collection="list" item="dialogue" separator=",">
+            (#{dialogue.series}, #{dialogue.season}, #{dialogue.episode}, #{dialogue.chinese}, #{dialogue.sentence}, #{dialogue.review})
+        </foreach>
+    </insert>
+</mapper>

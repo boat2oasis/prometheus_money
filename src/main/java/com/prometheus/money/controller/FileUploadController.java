@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class FileUploadController {
 	@GetMapping("/files")
 	public ResponseEntity<String> uploadImage(String base64Image) throws IOException {
-		System.out.println(base64Image);
 		return null;
 	}
 }

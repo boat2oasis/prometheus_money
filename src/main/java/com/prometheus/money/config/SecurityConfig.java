@@ -45,8 +45,10 @@ public class SecurityConfig {
 						.requestMatchers("/user/login", "/user/info", "/spentInformation/list", "/auth/codes",
 								"/stockData/get", "/stockInformation/saveStock",
 								"/excel/upload","/excel/loadStockInformation","/words/save",
-								"/dialogue/list","/wordFrequence/save","/words/list","/words/count","/frequency/list"
-								,"/words/reSetData","/words/alwaysloveu","/words/import","/dialogue/list2")
+								"/dialogue/list","/wordFrequence/save","/words/list","/words/count","/frequency/list","/frequency/logMap"
+								,"/words/reSetData","/words/alwaysloveu","/words/import"
+								,"/dialogue/list2","/similarity/caculateSimilarity",
+								"/dialogue","/dialogue/get","/dialogue/update","/dialogue/search")
 						.permitAll().anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class).build();

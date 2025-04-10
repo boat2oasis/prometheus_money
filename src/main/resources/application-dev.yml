@@ -3,7 +3,7 @@ spring:
     #url: jdbc:mysql://127.0.0.1:3306/account?useSSL=false&serverTimezone=UTC
     #username: root
     #password: Aini2025nian
-    url: jdbc:mysql://localhost:3306/english_learning?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/coca?useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: root2024_2025
     
@@ -16,9 +16,15 @@ spring:
       connection-timeout: 30000     # 连接超时30秒
   jackson:
     date-format: yyyy-MM-dd
+  elasticsearch:
+    uris: http://localhost:9200
   data:
     mongodb:
       uri: mongodb://localhost:27017/monthly-budget
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
 
 #mybatis-plus:
   #configuration:

@@ -1,5 +1,7 @@
 package com.prometheus.money.config;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,57 +23,57 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Autowired
-    private JwtUtils jwtUtils;
+	private JwtUtils jwtUtils;
 	@Autowired
-    private CustomUserDetailsService customUserDetailsService;
+	private CustomUserDetailsService customUserDetailsService;
 
-    private final Map<String, UserDetails> userDetailsCache = new ConcurrentHashMap<String, UserDetails>();
+	private final Map<String, UserDetails> userDetailsCache = new ConcurrentHashMap<String, UserDetails>();
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-             {
+		try {
+			String url = request.getRequestURL().toString(); // 获取完整的请求 URL
+			System.out.println("Request URL: " + url); // 打印 URL
+			System.out.println("Time: " + FORMATTER.format(LocalDateTime.now())); // 打印 URL
+			
+			String authorizationHeader = request.getHeader("Authorization");
+			String jwt = null;
+			String username = null;
 
-    	try {
-    		String url = request.getRequestURL().toString(); // 获取完整的请求 URL
-            System.out.println("Request URL: " + url); // 打印 URL
-        String authorizationHeader = request.getHeader("Authorization");
-        System.out.println("==================="+authorizationHeader+"===================");
-        String jwt = null;
-        String username = null;
+			// Extract JWT token from the header
+			if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+				jwt = authorizationHeader.substring(7);
+				username = jwtUtils.extractUsername(jwt);
+			}
 
-        // Extract JWT token from the header
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            username = jwtUtils.extractUsername(jwt);
-        }
+			// If username is found and the user is not authenticated yet
+			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-        // If username is found and the user is not authenticated yet
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+				// Check if UserDetails are already cached
+				UserDetails userDetails = userDetailsCache.get(username);
 
-            // Check if UserDetails are already cached
-            UserDetails userDetails = userDetailsCache.get(username);
+				if (userDetails == null) {
+					// If not cached, load from the database
+					userDetails = customUserDetailsService.loadUserByUsername(username);
+					// Cache the UserDetails for future requests
+					userDetailsCache.put(username, userDetails);
+				}
 
-            if (userDetails == null) {
-                // If not cached, load from the database
-                userDetails = customUserDetailsService.loadUserByUsername(username);
-                // Cache the UserDetails for future requests
-                userDetailsCache.put(username, userDetails);
-            }
+				// Validate the token and set authentication if valid
+				if (jwtUtils.validateToken(jwt, userDetails.getUsername())) {
+					UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+							userDetails, null, userDetails.getAuthorities());
+					authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            // Validate the token and set authentication if valid
-            if (jwtUtils.validateToken(jwt, userDetails.getUsername())) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					// Set the authentication in the security context
+					SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+				}
+			}
 
-                // Set the authentication in the security context
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
-        }
-
-        chain.doFilter(request, response);
-    	}catch(Exception e) {
-    		e.printStackTrace();
-    	}
-    }
+			chain.doFilter(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

@@ -42,7 +42,6 @@ public class BudgetController {
 	
 	@PostMapping("/save")
 	public Res<String> save(@RequestBody BudgetRe BudgetRe) {
-		System.out.println("===================================================/save");
 		Budget entity = new Budget();
 		BeanUtils.copyProperties(BudgetRe, entity);
 		budgetMapper.insertOrUpdate(entity);
@@ -51,7 +50,6 @@ public class BudgetController {
 
 	@GetMapping("/list")
 	public Res<List<BudgetVo>> list() {
-		System.out.println("===================================================/list");
 		QueryWrapper<Budget> queryWrapper = new QueryWrapper<>();
 		List<Budget> resultList = budgetMapper.selectList(queryWrapper);
 		List<BudgetVo> resultVoList = new ArrayList<BudgetVo>();

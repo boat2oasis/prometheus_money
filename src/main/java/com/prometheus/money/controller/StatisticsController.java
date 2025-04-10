@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.prometheus.money.entity.transfer.vo.PriceByCategoryVo;
 import com.prometheus.money.entity.transfer.vo.PriceByUsedForVo;
 import com.prometheus.money.entity.transfer.vo.SpentInformationVo;
 import com.prometheus.money.enums.ProductPurposeEnum;

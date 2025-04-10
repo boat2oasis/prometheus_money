@@ -1,6 +1,11 @@
 package com.prometheus.money.mapper;
 
 import com.prometheus.money.entity.Dialogue;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -12,5 +17,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2024-12-01
  */
 public interface DialogueMapper extends BaseMapper<Dialogue> {
-
+	void batchInsert(@Param("list") List<Dialogue> dialogues);
 }

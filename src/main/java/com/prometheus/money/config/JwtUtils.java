@@ -27,7 +27,6 @@ public class JwtUtils {
     
     // Generate a JWT token with expiration time
     public String generateToken(String username) {
-    	System.out.println(key);
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -56,8 +55,6 @@ public class JwtUtils {
     private Claims extractAllClaims(String token) throws Exception {
     	try {
     		 String base64Key = Base64.getEncoder().encodeToString(key.getEncoded());
-    	        System.out.println("Base64 Encoded Key: " + base64Key);
-    	        
         return Jwts.parserBuilder()
                 .setSigningKey(key) // Use the secure key for parsing the token
                 .build()

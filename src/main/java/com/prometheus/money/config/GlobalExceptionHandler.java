@@ -14,7 +14,6 @@ public class GlobalExceptionHandler {
     // 处理自定义异常
     @ExceptionHandler(SignatureException.class)
     public ResponseEntity<?> handleCustomException(SignatureException ex, WebRequest request) {
-    	System.out.println("=========================================");
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 }

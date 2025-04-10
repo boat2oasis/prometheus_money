@@ -47,7 +47,6 @@ public class SpentInformationController {
 
 	@PostMapping("/save")
 	public Res<String> save(@RequestBody SpentInformationRe spentInformationRe) {
-		System.out.println("===================================================/save");
 		SpentInformation entity = new SpentInformation();
 		BeanUtils.copyProperties(spentInformationRe, entity);
 		entity.setCreateAt(LocalDateTime.now());

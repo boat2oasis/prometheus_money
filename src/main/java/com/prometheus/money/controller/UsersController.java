@@ -44,7 +44,6 @@ public class UsersController {
     
     @PostMapping("/login")
     public Res<Map<String, Object>> login(@RequestBody UserVo user) throws AuthenticationException {
-    	System.out.println(passwordEncoder.encode("admind"));
     	String username = user.getUsername();
     	String password = user.getPassword();
     	authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));

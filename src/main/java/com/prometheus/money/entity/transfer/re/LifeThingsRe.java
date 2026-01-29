@@ -29,6 +29,14 @@ public class LifeThingsRe {
     private Byte isCarried;
 
     private String storageLocation;
+    
+    private String categoryName;
+    
+    private Integer sort;
+    
+    private Float weight;
+    
+    private Integer categorySort;
 
     private LocalDateTime createdAt;
 

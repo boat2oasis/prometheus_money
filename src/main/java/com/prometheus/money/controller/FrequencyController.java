@@ -9,10 +9,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.excel.util.StringUtils;
@@ -21,11 +23,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prometheus.money.entity.Frequency;
+import com.prometheus.money.entity.Request;
 import com.prometheus.money.entity.Similarity;
 import com.prometheus.money.entity.transfer.re.DialogueRe;
 import com.prometheus.money.res.LogRecord;
 import com.prometheus.money.res.Res;
 import com.prometheus.money.service.IFrequencyService;
+import com.prometheus.money.service.IRequestService;
 import com.prometheus.money.service.ISimilarityService;
 import com.prometheus.money.util.ClientIpAddress;
 
@@ -39,33 +43,36 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author Heisenberg
  * @since 2024-12-23
  */
-@RestController
-@RequestMapping("/frequency")
+@Controller
+@RequestMapping("/")
 public class FrequencyController {
 	@Autowired
 	private IFrequencyService frequencyService;
 
 	@Autowired
 	private ISimilarityService similarityService;
-	
-	public static Map<String,List<LogRecord>> logMap = new LinkedHashMap<String,List<LogRecord>>();
+	@Autowired
+	private IRequestService requestService;
+
+	public static Map<String, List<LogRecord>> logMap = new LinkedHashMap<String, List<LogRecord>>();
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 	@GetMapping("/logMap")
-	public Res<Map<String,List<LogRecord>>> logList() {
+	public Res<Map<String, List<LogRecord>>> logList() {
 		return Res.success(logMap);
 	}
-
-	@PostMapping("/list")
+    @ResponseBody
+	@PostMapping("frequency/list")
 	public Res<Page<Frequency>> listFrequency(@RequestBody DialogueRe dialogueRe, HttpServletRequest request) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		
+
 		String clientAddress = ClientIpAddress.getClientIpAddress();
 		LogRecord log = new LogRecord();
-		String uri = request.getRequestURI(); 
+		String uri = request.getRequestURI();
 		ObjectMapper objectMapper = new ObjectMapper();
+		String jsonString = null;
 		try {
-			String jsonString = objectMapper.writeValueAsString(dialogueRe);
+			jsonString = objectMapper.writeValueAsString(dialogueRe);
 			log.setRequestParam(jsonString);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
@@ -74,16 +81,15 @@ public class FrequencyController {
 		log.setIp(clientAddress);
 		log.setTime(FORMATTER.format(LocalDateTime.now()));
 		log.setUri(uri);
-		if(logMap.get(clientAddress) == null) {
-			List<LogRecord> logList = new ArrayList<>();
-			logList.add(log);
-			logMap.put(clientAddress, logList);
-		}else {
-			logMap.get(clientAddress).add(log);
-		}
-		
 
-		Integer current = dialogueRe.getCurrent()==null?0: dialogueRe.getCurrent();
+		Request requestDatabase = new Request();
+		requestDatabase.setIp(clientAddress);
+		requestDatabase.setRequestParam(jsonString);
+		requestDatabase.setUri(uri);
+		requestDatabase.setTime(LocalDateTime.now());
+		requestService.save(requestDatabase);
+
+		Integer current = dialogueRe.getCurrent() == null ? 1 : dialogueRe.getCurrent() + 1;
 		String key = dialogueRe.getKey().replace(" ", "");
 		Integer size = dialogueRe.getSize();
 		String labelPosition = dialogueRe.getLabelPosition();
@@ -112,6 +118,7 @@ public class FrequencyController {
 
 					LambdaQueryWrapper<Similarity> similaritywrapper = new LambdaQueryWrapper<Similarity>();
 					similaritywrapper.eq(Similarity::getFrequencyWord, key);
+					similaritywrapper.orderByDesc(Similarity::getSimilarity);
 					List<Similarity> similarityList = similarityService.list(similaritywrapper);
 					List<String> worldList = new ArrayList<>();
 					for (Similarity si : similarityList) {
@@ -126,14 +133,82 @@ public class FrequencyController {
 				}
 			}
 		}
+		wrapper.orderByDesc(Frequency::getFrequency).orderByAsc(Frequency::getCoca);
 		Page<Frequency> dialogueList = frequencyService.page(pages, wrapper);
 		if (!StringUtils.isBlank(key)) {
-		String targetChar = "<span style=\"color:#d93025;\">"+key+"</span>";
-		for(Frequency frequency:dialogueList.getRecords()) {
-			
-			frequency.setWord(frequency.getWord().replace(key, targetChar));
-		}}
-		
+			String targetChar = "<span style=\"color:#d93025;\">" + key + "</span>";
+			for (Frequency frequency : dialogueList.getRecords()) {
+
+				frequency.setWord(frequency.getWord().replace(key, targetChar));
+			}
+		}
+		dialogueList.setCurrent(current - 1);
 		return Res.success(dialogueList);
+	}
+
+	@GetMapping("frequency")
+	public String listFrequencyPage(
+			@org.springframework.web.bind.annotation.RequestParam(defaultValue = "1") Integer page,
+			@org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") Integer size,
+			@org.springframework.web.bind.annotation.RequestParam(required = false) String keyword,
+			@org.springframework.web.bind.annotation.RequestParam(required = false) String type,
+			org.springframework.ui.Model model) {
+
+		Page<Frequency> pages = new Page<>(page, size);
+		LambdaQueryWrapper<Frequency> wrapper = new LambdaQueryWrapper<>();
+
+		if (!StringUtils.isBlank(keyword)) {
+			String key = keyword.trim().replace(" ", "");
+			if (!StringUtils.isBlank(type)) {
+				if ("all".equals(type)) {
+					wrapper.like(Frequency::getWord, key);
+				} else if ("after".equals(type)) {
+					wrapper.likeLeft(Frequency::getWord, key);
+				} else if ("before".equals(type)) {
+					wrapper.likeRight(Frequency::getWord, key);
+				} else if ("central".equals(type)) {
+					wrapper.notLikeRight(Frequency::getWord, key)
+							.notLikeLeft(Frequency::getWord, key)
+							.like(Frequency::getWord, key);
+				} else if ("similar".equals(type)) {
+					LambdaQueryWrapper<Similarity> similaritywrapper = new LambdaQueryWrapper<>();
+					similaritywrapper.eq(Similarity::getFrequencyWord, key);
+					similaritywrapper.orderByDesc(Similarity::getSimilarity);
+					List<Similarity> similarityList = similarityService.list(similaritywrapper);
+					List<String> worldList = new ArrayList<>();
+					for (Similarity si : similarityList) {
+						worldList.add(si.getSimilarityWord());
+					}
+					if (worldList.isEmpty()) {
+						worldList.add(UUID.randomUUID().toString());
+					}
+					wrapper.in(Frequency::getWord, worldList);
+				}
+			} else {
+				// Default search if type is missing but keyword exists
+				wrapper.like(Frequency::getWord, key);
+			}
+		}
+
+		wrapper.orderByDesc(Frequency::getFrequency).orderByAsc(Frequency::getCoca);
+
+		Page<Frequency> resultPage = frequencyService.page(pages, wrapper);
+
+		// Highlight keyword
+		if (!StringUtils.isBlank(keyword)) {
+			String key = keyword.trim().replace(" ", "");
+			String targetChar = "<span style=\"color:#d93025;\">" + key + "</span>";
+			for (Frequency frequency : resultPage.getRecords()) {
+				if (frequency.getWord() != null) {
+					frequency.setWord(frequency.getWord().replace(key, targetChar));
+				}
+			}
+		}
+
+		model.addAttribute("page", resultPage);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("type", type);
+
+		return "frequency";
 	}
 }

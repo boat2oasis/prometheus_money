@@ -1,9 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://114.132.201.185:3306/account?useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://114.132.201.185:3306/coca?useSSL=false&serverTimezone=Asia/Shanghai
     username: root
-    password: Aini2025nian
-    
+    password: Aini2026nian!
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       minimum-idle: 5              # 最小空闲连接数
@@ -13,3 +12,7 @@ spring:
       connection-timeout: 30000     # 连接超时30秒
   jackson:
     date-format: yyyy-MM-dd
+  elasticsearch:
+    uris: http://127.0.0.1:9200
+    username: elastic
+    #password: DdoMvP7jyFaOeQ6lG5-k

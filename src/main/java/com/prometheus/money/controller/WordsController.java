@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,23 +21,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.prometheus.money.entity.Coca;
 import com.prometheus.money.entity.Dialogue;
 import com.prometheus.money.entity.Frequency;
+import com.prometheus.money.entity.SimpleDictionary;
 import com.prometheus.money.entity.Words;
 import com.prometheus.money.entity.transfer.vo.WordDo;
-import com.prometheus.money.mapper.CocaMapper;
 import com.prometheus.money.mapper.DialogueMapper;
 import com.prometheus.money.mapper.FrequencyMapper;
+import com.prometheus.money.mapper.SimpleDictionaryMapper;
 import com.prometheus.money.mapper.WordsMapper;
 import com.prometheus.money.res.Res;
 import com.prometheus.money.service.ICocaService;
@@ -70,40 +75,17 @@ public class WordsController {
 	private FrequencyMapper frequencyMapper;
 	@Autowired
 	private IFrequencyService frequencyService;
-	@Autowired
-	private CocaMapper cocaMapper;
+	
 	@Autowired
 	private ICocaService cocaService;
 	@Autowired
 	private DialogueMapper dialogueMapper;
+	@Autowired
+	private  SimpleDictionaryMapper simpleDictionaryMapper;
 
 	private Integer n = 1;
 
-	private List<String> seriesList = new ArrayList<>();
 
-	Map<String, List<Season>> seriesMap = new HashMap<String, List<Season>>();
-
-	@GetMapping("/list")
-	public Res<Integer> listData() {
-
-		StoreData();
-
-		List<String> seriesListSearch = new ArrayList<>();
-		for (int i = 0; i < seriesList.size(); i++) {
-			seriesListSearch.add(seriesList.get(i));
-			List<Season> season = seriesMap.get(seriesList.get(i));
-			for (int j = 0; i < season.size(); j++) {
-
-			}
-		}
-
-		Integer result = wordsMapper.countDistinctWords(seriesList,
-				seriesMap.get("摩登家庭").stream().map(Season::getSeasonNumber) // 提取每个 item 的 seasonNumber
-						.collect(Collectors.toList()),
-				Arrays.asList(1));
-
-		return Res.success(result);
-	}
 
 	//@GetMapping("/reSetData")
 	public Res<String> reSetData() {
@@ -192,25 +174,7 @@ public class WordsController {
 		return Res.success("成功");
 	}
 
-	// @GetMapping("/save")
-	public Res<String> StoreData() {
 
-		seriesMap.put("摩登家庭",
-				Arrays.asList(new Season(1, 24), new Season(2, 23), new Season(3, 24), new Season(4, 24),
-						new Season(5, 24), new Season(6, 24), new Season(7, 22), new Season(8, 22), new Season(9, 22),
-						new Season(10, 22)));
-
-		seriesMap.put("硅谷", Arrays.asList(new Season(1, 8), new Season(2, 10), new Season(3, 10), new Season(4, 10),
-				new Season(5, 8), new Season(6, 7)));
-
-		seriesMap.put("神烦警探", Arrays.asList(new Season(1, 22), new Season(2, 23)));
-
-		seriesMap.put("绝命毒师", Arrays.asList(new Season(1, 7), new Season(2, 13), new Season(3, 13), new Season(4, 13),
-				new Season(5, 16)));
-
-		seriesList.addAll(Arrays.asList("摩登家庭", "硅谷", "神烦警探", "绝命毒师"));
-		return Res.success(null);
-	}
 
 	@GetMapping("/alwaysloveu")
 	public Res<String> alwaysloveu() {
@@ -275,16 +239,61 @@ public class WordsController {
 		@ExcelProperty("sort")
 		private Integer sort;
 	}
+	
+	
+	
+	// @PostMapping("/import")
+	@GetMapping("/importFile")
+		public Res<String> doFileIMPORT()
+				{
+		
+		int i = 0;
+		
+        List<String> result = new ArrayList<>();
+        String path = "D:\\0deep\\pythonProject\\regdict_data_s.xlsx";
+        try (InputStream inputStream = new FileInputStream(path);
+             Workbook workbook = new XSSFWorkbook(inputStream)) {
+
+            Sheet sheet = workbook.getSheetAt(0); // 读取第一个工作表
+            for (Row row : sheet) {
+            	i++;
+                Cell cell = row.getCell(0); // 第一列是索引 0
+                if (cell != null) {
+                    cell.setCellType(CellType.STRING); // 强制转为字符串
+                    result.add(cell.getStringCellValue().trim());
+                    SimpleDictionary  simpleDictionary = new SimpleDictionary();
+                    simpleDictionary.setWord(cell.getStringCellValue().trim());
+                    simpleDictionaryMapper.insert(simpleDictionary);
+                    System.out.println(i);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+		return null;
+		}
+	
+	
+	
+	
 
 	// @PostMapping("/import")
 	@GetMapping("/import")
 	public Res<String> doExcel(/* @RequestParam(value = "file", required = true) MultipartFile file */)
 			throws IOException {
 
-		// String filePath = Paths.get("‪D:", "00", "00","coca.xls").toString();
-		// String fileName = "‪C:\\Users\\MSI_NB\\Desktop\\coca.xls";
 
-		// do Map
+		synchronized (this) {
+			if (n == 1) {
+				n++;
+				System.out.println("n  是 ");
+			} else {
+				System.out.println("不要重复操作");
+				return Res.fail("重复操作");
+			}
+		}
+		
 
 		Map<String, Frequency> frequencyMap = new HashMap<String, Frequency>();
 		Map<String, Coca> cocaMap = new HashMap<String, Coca>();
@@ -302,7 +311,8 @@ public class WordsController {
 
 		for (Frequency frequency : frequencyList) {
 			Coca coca = cocaMap.get(frequency.getWord());
-			if (coca != null) {
+			 System.out.println(coca);
+			if (coca != null && frequency.getCoca() == null ){
 				frequency.setCoca(coca.getSort());
 				frequencyService.updateById(frequency);
 			}
@@ -351,6 +361,8 @@ public class WordsController {
 			List<Serious> seriousList = new ArrayList<>();
 
 			
+			
+	       
 			// sillcon
 			seriousList.add(new Serious("sillcon", "硅谷", 1, 8));
 			seriousList.add(new Serious("sillcon", "硅谷", 2, 10));
@@ -453,6 +465,101 @@ public class WordsController {
 			seriousList.add(new Serious("shameless", "无耻之徒", 10, 12));
 			seriousList.add(new Serious("shameless", "无耻之徒", 11, 12));
 			
+			
+
+			//breakgirl
+			seriousList.add(new Serious("breakgirl", "破产姐妹", 1, 24));
+			seriousList.add(new Serious("breakgirl", "破产姐妹", 2, 24));
+			seriousList.add(new Serious("breakgirl", "破产姐妹", 3, 24));
+			seriousList.add(new Serious("breakgirl", "破产姐妹", 4, 22));
+			seriousList.add(new Serious("breakgirl", "破产姐妹", 5, 22));
+			seriousList.add(new Serious("breakgirl", "破产姐妹", 6, 22));
+			
+	
+			
+			//breakgirl
+			seriousList.add(new Serious("gossipgirl", "绯闻女孩", 1, 18));
+			seriousList.add(new Serious("gossipgirl", "绯闻女孩", 2, 25));
+			seriousList.add(new Serious("gossipgirl", "绯闻女孩", 3, 22));
+			seriousList.add(new Serious("gossipgirl", "绯闻女孩", 4, 22));
+			seriousList.add(new Serious("gossipgirl", "绯闻女孩", 5, 24));
+			seriousList.add(new Serious("gossipgirl", "绯闻女孩", 6, 10));
+			
+			
+			
+	
+			//girlsmeet
+			seriousList.add(new Serious("girlsmeet", "女孩成长记", 1, 21));
+			seriousList.add(new Serious("girlsmeet", "女孩成长记", 2, 30));
+			seriousList.add(new Serious("girlsmeet", "女孩成长记", 3, 21));
+			
+			
+			
+			
+			
+			
+			//girlsmeet
+			seriousList.add(new Serious("vampire", "吸血鬼日记", 1, 22));
+			seriousList.add(new Serious("vampire", "吸血鬼日记", 2, 22));
+			seriousList.add(new Serious("vampire", "吸血鬼日记", 3, 22));
+			seriousList.add(new Serious("vampire", "吸血鬼日记", 4, 23));
+			seriousList.add(new Serious("vampire", "吸血鬼日记", 5, 22));
+			seriousList.add(new Serious("vampire", "吸血鬼日记", 6, 22));
+			seriousList.add(new Serious("vampire", "吸血鬼日记", 7, 22));
+			seriousList.add(new Serious("vampire", "吸血鬼日记", 8, 16));
+			
+			
+			
+		
+			//horseman
+			seriousList.add(new Serious("horseman", "马男波杰克", 1, 12));
+			seriousList.add(new Serious("horseman", "马男波杰克", 2, 12));
+			seriousList.add(new Serious("horseman", "马男波杰克", 3, 12));
+			seriousList.add(new Serious("horseman", "马男波杰克", 4, 12));
+			seriousList.add(new Serious("horseman", "马男波杰克", 5, 12));
+			seriousList.add(new Serious("horseman", "马男波杰克", 6, 16));
+			
+			//rickandmorty
+			seriousList.add(new Serious("rickandmorty", "瑞克和莫蒂", 1, 11));
+			seriousList.add(new Serious("rickandmorty", "瑞克和莫蒂", 2, 10));
+			seriousList.add(new Serious("rickandmorty", "瑞克和莫蒂", 3, 10));
+			seriousList.add(new Serious("rickandmorty", "瑞克和莫蒂", 4, 10));
+			seriousList.add(new Serious("rickandmorty", "瑞克和莫蒂", 5, 10));
+			seriousList.add(new Serious("rickandmorty", "瑞克和莫蒂", 6, 10));
+			seriousList.add(new Serious("rickandmorty", "瑞克和莫蒂", 7, 10));
+	
+	
+			
+			//harrypottery
+			seriousList.add(new Serious("harrypottery", "哈里波特", 1, 8));
+			
+			
+			//fucktheworld
+			seriousList.add(new Serious("fucktheworld", "去他*的世界", 1, 8));
+			seriousList.add(new Serious("fucktheworld", "去他*的世界", 2, 8));
+			
+			seriousList.add(new Serious("wayne", "韦恩", 1, 5));
+			
+			seriousList.add(new Serious("avatar", "降世神通-最后的气宗", 1, 8));
+			
+			
+			
+			
+			seriousList.add(new Serious("newgirl", "杰茜驾到", 1, 24));//少2
+			
+			
+			seriousList.add(new Serious("newgirl", "杰茜驾到", 2, 25));//少2
+			
+			seriousList.add(new Serious("newgirl", "杰茜驾到", 3, 23));//少2
+
+			seriousList.add(new Serious("newgirl", "杰茜驾到", 4, 22));//少2
+	
+			seriousList.add(new Serious("newgirl", "杰茜驾到", 5, 22));//少2
+			
+			seriousList.add(new Serious("newgirl", "杰茜驾到", 6, 23));//少2
+			
+			
+
 			return seriousList;
 
 		}
@@ -470,26 +577,13 @@ public class WordsController {
 		}
 	}
 	
-	class LargeObject {
-		private int[] data;
 
-		public LargeObject(int size) {
-			this.data = new int[size]; // 创建一个大数组
-			for (int i = 0; i < size; i++) {
-				this.data[i] = i; // 填充数据
-			}
-		}
-
-		public int[] getData() {
-			return data;
-		}
-	}
 	
 
-	@GetMapping("/save")
+	//@GetMapping("/save")
 	public Res<String> uploadImage() throws UnsupportedEncodingException, FileNotFoundException, IOException {
 
-		
+		/*
 		List<LargeObject> objList = new ArrayList<LargeObject>();
 		int p = 0;
 		while (p < 1000000000) {
@@ -500,6 +594,7 @@ public class WordsController {
 		for(int j=0;j<p;j++) {
 			System.out.println(objList.get(j).getData());
 		}
+		*/
 		
 		synchronized (this) {
 			if (n == 1) {
@@ -507,17 +602,22 @@ public class WordsController {
 				System.out.println("n  是 ");
 			} else {
 				System.out.println("不要重复操作");
-				// return Res.fail("重复操作");
+				return Res.fail("重复操作");
 			}
 		}
 		long start = System.currentTimeMillis();
 		Serious seriousObj = new Serious();
+		
+		
 		List<Serious> seriousList = seriousObj.getSeriousList();
 		
 		//List<Serious> seriousList = new ArrayList<>();
 	    //seriousList.add(new Serious("theory", "生活大爆炸", 5, 12));
 	    
+		//String spiltText = "4c&H000000&";
 		String spiltText = "4c&H000000&";
+		
+		//shad1
 
 		for (Serious seriousItem : seriousList) {
 
@@ -528,12 +628,14 @@ public class WordsController {
 			//System.out.println(seriousList.size());
 
 			for (int i = 1; i <= seriousItem.getEpisode(); i++) {
+				//for (int i = 9; i <= 9; i++) {
 				//for (int i = 8; i <= 8; i++) {
 
 				// for (int i = 9; i <= 24; i++) {
+			
 				String filePath = Paths.get("D:", "00", "00", seriesEn, "season" + reason, i + ".ass").toString();
 
-				// System.out.println(filePath);
+				System.out.println(filePath);
 
 				// System.out.println(filePath);
 				List<String> realSentenceList = new ArrayList<>();
@@ -547,10 +649,11 @@ public class WordsController {
 				//修改文件内容
 				//extractSubtitlesFromASSff(filePath, "UTF-16", realSentenceList,realChineseSentenceList, spiltText,seriousItem, i); // 指定文件编码
 
-				//System.out.println(filePath);
+				System.out.println(filePath);
 
 				List<Dialogue> dialogueList = new ArrayList<>();
 				for (int j = 0; j < realSentenceList.size(); j++) {
+					
 					/*
 					if(j == realSentenceList.size()-1) {
 						LambdaQueryWrapper<Dialogue> wrapper = new  LambdaQueryWrapper<Dialogue>();
@@ -559,23 +662,26 @@ public class WordsController {
 						
 						List<Dialogue> dialogueLists =dialogueSerivce.list(wrapper);
 						if(dialogueLists.size()<1) {
+							System.out.println(seriousItem.getSeries()+":"+seriousItem.getReason()+":"+seriousItem.getEpisode());
 							System.out.println("有bug");
 						}
 						
 					}*/
 					
 					Dialogue dialogue = new Dialogue();
+					
+			
 
-					dialogue.setChinese(realChineseSentenceList.get(j));
+					dialogue.setChinese(realChineseSentenceList.get(j).replaceAll("\\{[^}]*\\}", ""));
 					dialogue.setReview(true);
 					//System.out.println(realSentenceList.get(j));
 					//System.out.println(realChineseSentenceList.get(j));
-					dialogue.setSentence(realSentenceList.get(j));
+					dialogue.setSentence(realSentenceList.get(j).replaceAll("\\{[^}]*\\}", ""));
 					dialogue.setEpisode(i);
 					dialogue.setSeason(reason);
 					dialogue.setSeries(series);
 					dialogueList.add(dialogue);
-					// dialogueSerivce.save(dialogue);
+				    //dialogueSerivce.save(dialogue);
 				}
 				/*
 				LambdaQueryWrapper<Dialogue> lambdaQueryWrapper = new LambdaQueryWrapper<Dialogue>();
@@ -592,7 +698,9 @@ public class WordsController {
 					System.out.println(seriousItem.getSeries() +":"+ seriousItem.getReason() +":"+ i);
 				}*/
 			
-				
+				if(dialogueList.size()>0) {
+					dialogueMapper.batchInsert(dialogueList);
+				}
 				//dialogueMapper.batchInsert(dialogueList);
 			}
 		}
@@ -602,13 +710,14 @@ public class WordsController {
 
 	public static List<String> extractSubtitlesFromASSTest(String filePath, String charset,
 			List<String> realSentenceList, List<String> realChineseSentenceList, String spiltText, Serious serious,
-			int i) throws UnsupportedEncodingException, FileNotFoundException, IOException {
+			int i) throws UnsupportedEncodingException, IOException {
 		List<String> updatedLines = new ArrayList<>();
 		try (BufferedReader reader = new BufferedReader(
 				new InputStreamReader(new FileInputStream(filePath), charset))) {
 			String line;
-			while ((line = reader.readLine()) != null) {
+			while ((line = reader.readLine()) != null  ) {
 				String[] arr = line.split("4c&H000000&");
+				//System.out.println(arr.length);
 				if (arr.length > 2) {
 					System.out.println(serious.getSeries() + serious.getReason() + i);
 					System.out.println(line);
@@ -616,23 +725,34 @@ public class WordsController {
 			}
 			// 将更新后的行写回文件
 
+		}catch(FileNotFoundException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
-
+	
+	
 	public static List<String> extractSubtitlesFromASSff(String filePath, String charset, List<String> realSentenceList,
 			List<String> realChineseSentenceList, String spiltText, Serious serious, int i)
-			throws UnsupportedEncodingException, FileNotFoundException, IOException {
+			{
 		List<String> updatedLines = new ArrayList<>();
 		try (BufferedReader reader = new BufferedReader(
 				new InputStreamReader(new FileInputStream(filePath), charset))) {
 			String line;
-			while ((line = reader.readLine()) != null) {
-				if (line.contains(spiltText)) {
+			while ((line = reader.readLine()) != null   ) {
+				if (line.contains(spiltText) && !line.contains("bord0")  && !line.contains("an8")  && !line.contains("an4")) {
 					//line = line.replace("{\\blur3}", "");
+					
+					//String spiltText = "4c&H000000&";
+					//line = line.replace("{\\*}","");
+					//line = line.replace("\\N", "\\N{\\fn微软雅黑}{\\4c&H000000&}{\\b0}{\\c&HFFFFFF&&}{\\3c&000000&}{\\4c&H000000&}");
+					//line = replaceSecondBackslashN(line);
 					updatedLines.add(line);
-				} else {
-					System.out.println(line);
+					
+				} else if(line.contains("shad1")){
+					//line = line.replace("shad1","4c&H000000&");
+					//updatedLines.add(line);
+					//System.out.println(line);
 				}
 			}
 
@@ -648,14 +768,20 @@ public class WordsController {
 			}
 
 			return null;
+		}catch(FileNotFoundException e) {
+			e.printStackTrace();
 		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	
 	
 	public static List<String> extractSubtitlesFromASS(String filePath, String charset, List<String> realSentenceList,
 			List<String> realChineseSentenceList, String spiltText, Serious serious,
-			int i) {
+			int i) throws UnsupportedEncodingException, IOException {
 
 		String regex = "[\\u4e00-\\u9fa5]";
 		Pattern pattern = Pattern.compile(regex);
@@ -691,7 +817,6 @@ public class WordsController {
 							// 获取到当前行的中文和英文
 							sentanceChinese = text.split("\\\\N")[0];
 							sentanceChinese = sentanceChinese.substring(1, sentanceChinese.length());
-
 							if (realSentance.length() == 0 || realSentance.endsWith(" ")) {
 								if(text.contains("an8")) {
 									System.out.println(serious.getSeries() +":"+ serious.getReason() +":"+ i);
@@ -704,6 +829,8 @@ public class WordsController {
 								}else {
 									System.out.println(serious.getSeries() +":"+ serious.getReason() +":"+ i);
 									System.out.println(subTitle.substring(1, subTitle.length()));
+									System.out.println(sentanceChinese);
+									System.out.println(subTitle);
 									continue;
 								}
 							} else {
@@ -718,16 +845,14 @@ public class WordsController {
 							}
 
 							// 判断最后一个词是否是英文
+							//System.out.println(realSentance);
 							boolean endsWithLetter = realSentance.endsWith(",") || realSentance.endsWith("-")
 									|| realSentance.endsWith("，")
 									|| ((realSentance.charAt(realSentance.length() - 1) >= 'A'
 											&& realSentance.charAt(realSentance.length() - 1) <= 'Z')
 											|| (realSentance.charAt(realSentance.length() - 1) >= 'a'
 													&& realSentance.charAt(realSentance.length() - 1) <= 'z'));
-							// 需要加上下一句
-							if("Yo, Billie!".equals(realSentance)) {
-								System.out.println("Hello World");
-							}
+		
 
 							Matcher matcher = pattern.matcher(realSentance);
 							if (!matcher.find()) {
@@ -749,28 +874,11 @@ public class WordsController {
 					}
 				}
 			}
-		} catch (IOException e) {
+		} catch (FileNotFoundException e) {
 			System.err.println("Error reading file: " + e.getMessage());
 		}
 
 		return null;
 	}
 
-	class Season {
-		private int seasonNumber;
-		private int episodes;
-
-		public Season(int seasonNumber, int episodes) {
-			this.seasonNumber = seasonNumber;
-			this.episodes = episodes;
-		}
-
-		public int getSeasonNumber() {
-			return seasonNumber;
-		}
-
-		public int getEpisodes() {
-			return episodes;
-		}
-	}
 }

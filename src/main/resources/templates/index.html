@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词大师 | Word & Sentence Master</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+            --primary-color: #4f46e5;
+            --bg-body: #f1f5f9;
+            --soft-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            --active-tab-bg: #0ea5e9;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: #1e293b;
+            padding-bottom: 50px;
+        }
+
+        /* 顶部背景图 */
+        .header-bg {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.85) 0%, rgba(59, 130, 246, 0.75) 100%),
+                url('./image/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 360px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 0;
+            border-bottom-right-radius: 50px;
+            border-bottom-left-radius: 50px;
+        }
+
+        /* 导航栏样式 */
+        .navbar-custom {
+            position: relative;
+            z-index: 100;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .nav-link-custom {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            font-size: 1.15rem;
+            margin: 0 15px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            color: #ffffff !important;
+            font-weight: 600;
+        }
+
+        .nav-link-custom::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            bottom: -5px;
+            left: 50%;
+            background-color: #fff;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .nav-link-custom.active::after {
+            width: 20px;
+        }
+
+        .nav-link-custom:hover::after {
+            width: 100%;
+        }
+
+        .navbar-brand-custom {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        /* 主容器 */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            margin: 20px auto 40px;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            margin-top: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 副标题样式 */
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            font-size: 1.05rem;
+            margin-bottom: 40px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Tab 切换区域 */
+        .search-mode-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mode-tab-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: rgba(255, 255, 255, 0.95);
+            padding: 8px 24px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .mode-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+            color: white;
+        }
+
+        .mode-tab-btn.active {
+            background: var(--active-tab-bg);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* 搜索框样式 */
+        .search-container {
+            background: white;
+            padding: 8px 10px 8px 25px;
+            border-radius: 50px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .search-container:focus-within {
+            border-color: #bae6fd;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            border: none;
+            padding: 12px 0;
+            font-size: 1.1rem;
+            outline: none;
+            color: #334155;
+            background: transparent;
+        }
+
+        .search-input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .btn-search-icon {
+            background: transparent;
+            color: #64748b;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-search-icon:hover {
+            color: var(--primary-color);
+        }
+
+        /* 表格样式 */
+        .card-table {
+            background: white;
+            border-radius: 20px;
+            border: none;
+            box-shadow: var(--soft-shadow);
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 18px 24px;
+            border: none;
+        }
+
+        .table tbody td {
+            padding: 20px 24px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .word-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1e293b;
+        }
+
+        .translation-text {
+            display: block;
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        .btn-sentence {
+            background-color: #ecfdf5;
+            color: #059669;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-sentence:hover {
+            background-color: #d1fae5;
+            color: #047857;
+            transform: translateY(-1px);
+        }
+
+        /* --- 修改点：新增文本排名样式 --- */
+        .rank-text-movie {
+            color: #4338ca;
+            font-weight: 700;
+        }
+
+        .rank-text-coca {
+            color: #c2410c;
+            font-weight: 700;
+        }
+
+        .rank-divider {
+            color: #cbd5e1;
+            margin: 0 6px;
+            font-weight: 300;
+        }
+
+        /* 弹窗样式 */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 20px 30px;
+        }
+
+        .modal-body {
+            padding: 0;
+        }
+
+        .sentence-item {
+            padding: 20px 30px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .sentence-item:last-child {
+            border-bottom: none;
+        }
+
+        .en-sentence {
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .cn-sentence {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header-bg"></div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-custom" href="#">
+                <i class="bi bi-mortarboard-fill me-2"></i>单词大师
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse ms-lg-4" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link nav-link-custom active" href="/"
+                            onclick="setActive(this)">首页</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom" href="/frequency"
+                            onclick="setActive(this)">高频单词</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom" href="/dialogue"
+                            onclick="setActive(this)">电影例句</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="d-none d-lg-block">
+                <button class="btn btn-outline-light rounded-pill px-4 btn-sm">登录</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <h1 class="page-title">词频与例句数据库</h1>
+        <p class="page-subtitle">COCA词频 / 电影词频 / 前缀后缀查询</p>
+
+        <div class="search-mode-tabs">
+            <button class="mode-tab-btn active" onclick="switchMode('general', this)">🔍 智能查询</button>
+            <button class="mode-tab-btn" onclick="switchMode('prefix', this)">🔤 前缀 (Prefix)</button>
+            <button class="mode-tab-btn" onclick="switchMode('suffix', this)">🔚 后缀 (Suffix)</button>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="请输入您要查询的内容 (中/英)"
+                onkeypress="handleEnter(event)">
+            <button class="btn btn-sm text-secondary rounded-circle me-2" onclick="resetData()" title="清空"
+                style="width: 30px; height: 30px;">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <button class="btn-search-icon" onclick="performSearch()">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+
+        <div class="card card-table">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 25%;">单词 & 释义</th>
+                            <th scope="col">例句</th>
+                            <th scope="col">电影词频</th>
+                            <th scope="col">电影|COCA 排名</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody"></tbody>
+                </table>
+            </div>
+
+            <div id="noResults" class="text-center py-5 text-muted" style="display: none;">
+                <i class="bi bi-inbox fs-1 d-block mb-2 opacity-25"></i>
+                未找到相关单词
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="sentenceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h4 class="modal-title fw-bold brand-font text-primary" id="modalWord">Word</h4>
+                        <span class="text-secondary" id="modalTrans">Translation</span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalSentences"></div>
+                <div class="modal-footer bg-light border-0 py-2">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setActive(element) {
+            document.querySelectorAll('.nav-link-custom').forEach(link => {
+                link.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        const wordDatabase = [
+            { word: "paranormal", translation: "超自然的", freq: 520, movie_rank: 3000, coca_rank: 4500, sentences: [{ en: "Do you believe in paranormal activity?", cn: "你相信超自然现象吗？" }, { en: "He investigates paranormal events.", cn: "他负责调查超自然事件。" }] },
+            { word: "paradise", translation: "天堂；乐园", freq: 1200, movie_rank: 1500, coca_rank: 2000, sentences: [{ en: "This island is truly a paradise on earth.", cn: "这个岛简直是人间天堂。" }, { en: "They spent their honeymoon in a tropical paradise.", cn: "他们在热带天堂度过了蜜月。" }] },
+            { word: "curious", translation: "好奇的；古怪的", freq: 1500, movie_rank: 1200, coca_rank: 1300, sentences: [{ en: "I was curious to know what would happen next.", cn: "我很好奇接下来会发生什么。" }, { en: "It was a curious coincidence.", cn: "这是一个奇怪的巧合。" }] },
+            { word: "apple", translation: "苹果", freq: 5000, movie_rank: 200, coca_rank: 300, sentences: [{ en: "An apple a day keeps the doctor away.", cn: "一天一苹果，医生远离我。" }] },
+            { word: "application", translation: "应用；申请", freq: 2000, movie_rank: 800, coca_rank: 900, sentences: [{ en: "Have you sent in your job application?", cn: "你递交求职申请了吗？" }, { en: "This application runs on both iOS and Android.", cn: "这个应用程序在 iOS 和 Android 上都能运行。" }] },
+            { word: "action", translation: "行动；动作", freq: 2500, movie_rank: 600, coca_rank: 700, sentences: [{ en: "Actions speak louder than words.", cn: "事实胜于雄辩。" }] }
+        ];
+
+        let currentSearchType = 'general';
+
+        window.onload = function () {
+            renderTable(wordDatabase);
+        };
+
+        function handleEnter(e) { if (e.key === 'Enter') performSearch(); }
+
+        function resetData() {
+            document.getElementById('searchInput').value = '';
+            performSearch();
+        }
+
+        function switchMode(type, btnElement) {
+            currentSearchType = type;
+            document.querySelectorAll('.mode-tab-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            const input = document.getElementById('searchInput');
+            if (type === 'general') input.placeholder = "请输入您要查询的内容 (中/英)";
+            else if (type === 'prefix') input.placeholder = "请输入单词前缀 (例如: 'para')";
+            else if (type === 'suffix') input.placeholder = "请输入单词后缀 (例如: 'tion')";
+            input.focus();
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            let filteredData = [];
+            if (!query) filteredData = [...wordDatabase];
+            else {
+                filteredData = wordDatabase.filter(item => {
+                    const w = item.word.toLowerCase();
+                    const t = item.translation.toLowerCase();
+                    if (currentSearchType === 'prefix') return w.startsWith(query);
+                    else if (currentSearchType === 'suffix') return w.endsWith(query);
+                    else return w.includes(query) || t.includes(query);
+                });
+            }
+            filteredData.sort((a, b) => a.movie_rank - b.movie_rank);
+            renderTable(filteredData);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('resultsBody');
+            const noResults = document.getElementById('noResults');
+            const tableEl = document.querySelector('.table');
+
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                noResults.style.display = 'block';
+                tableEl.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                tableEl.style.display = 'table';
+            }
+
+            data.forEach(item => {
+                /* 修改点：更新了排名的HTML结构，使用纯文本 + 颜色区分 */
+                const row = `
+                <tr>
+                    <td><div class="word-text">${item.word}</div><span class="translation-text">${item.translation}</span></td>
+                    <td><button class="btn-sentence" onclick="openSentenceModal('${item.word}')"><i class="bi bi-chat-quote-fill me-1"></i> 查看 (${item.sentences.length})</button></td>
+                    <td class="fw-medium text-secondary">${item.freq.toLocaleString()}</td>
+                    <td>
+                        <span class="rank-text-movie">${item.movie_rank}</span>
+                        <span class="rank-divider">|</span>
+                        <span class="rank-text-coca">${item.coca_rank}</span>
+                    </td>
+                </tr>
+            `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function openSentenceModal(wordText) {
+            const item = wordDatabase.find(w => w.word === wordText);
+            if (!item) return;
+            document.getElementById('modalWord').textContent = item.word;
+            document.getElementById('modalTrans').textContent = item.translation;
+            const sentencesContainer = document.getElementById('modalSentences');
+            sentencesContainer.innerHTML = '';
+            if (item.sentences && item.sentences.length > 0) {
+                item.sentences.forEach(sent => {
+                    const div = document.createElement('div');
+                    div.className = 'sentence-item';
+                    div.innerHTML = `<span class="en-sentence">${sent.en}</span><span class="cn-sentence">${sent.cn}</span>`;
+                    sentencesContainer.appendChild(div);
+                });
+            } else sentencesContainer.innerHTML = '<div class="p-4 text-center text-muted">暂无例句数据</div>';
+            const myModal = new bootstrap.Modal(document.getElementById('sentenceModal'));
+            myModal.show();
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

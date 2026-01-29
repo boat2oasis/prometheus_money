@@ -4,6 +4,10 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,22 @@ public class TestMyLove {
 
 	@Test
 	public void setKey() throws IOException {
+		
+	
+	
+		
+		Runnable calsl =() -> {
+			System.out.println("HELLO WORLD");
+			
+		}; 
+		
+		
+		 ExecutorService executor = Executors.newSingleThreadExecutor();
+
+	    
+
+		
+		
 		long startTime = System.nanoTime();
 		
 		FileOutputStream fos = new FileOutputStream("runoob.txt");

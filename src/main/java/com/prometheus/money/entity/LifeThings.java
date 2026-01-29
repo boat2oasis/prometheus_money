@@ -37,8 +37,16 @@ public class LifeThings implements Serializable {
     private BigDecimal price;
 
     private Byte isCarried;
+    
+    private String categoryName;
+    
+    private Integer categorySort;
 
     private String storageLocation;
+    
+    private Integer sort;
+    
+    private Float weight;
 
     private LocalDateTime createdAt;
 

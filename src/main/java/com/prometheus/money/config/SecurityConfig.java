@@ -44,11 +44,13 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/user/login", "/user/info", "/spentInformation/list", "/auth/codes",
 								"/stockData/get", "/stockInformation/saveStock",
-								"/excel/upload","/excel/loadStockInformation","/words/save",
-								"/dialogue/list","/wordFrequence/save","/words/list","/words/count","/frequency/list","/frequency/logMap"
-								,"/words/reSetData","/words/alwaysloveu","/words/import"
-								,"/dialogue/list2","/similarity/caculateSimilarity",
-								"/dialogue","/dialogue/get","/dialogue/update","/dialogue/search")
+								"/excel/upload", "/excel/loadStockInformation", "/words/save",
+								"/dialogue/list", "/wordFrequence/save", "/words/list", "/words/count",
+								"/frequency/list", "/frequency/logMap", "/words/reSetData", "/words/alwaysloveu",
+								"/words/importFile", "/words/import", "/dialogue/list2",
+								"/similarity/caculateSimilarity",
+								"/dialogue", "/dialogue/get", "/dialogue/update", "/dialogue/search", "/thymeleaf", "/",
+								"/english/**", "/css/**", "/frequency")
 						.permitAll().anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class).build();

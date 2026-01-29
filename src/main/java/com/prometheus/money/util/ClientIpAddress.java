@@ -25,7 +25,10 @@ public class ClientIpAddress {
 	    if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
 	        ipAddress = request.getRemoteAddr();
 	    }
-	    return ipAddress;
+	    if(ipAddress.contains(",")) {
+	    	
+	    }
+	    return ipAddress.split(",")[0];
 	}
 	
 }

@@ -7,11 +7,11 @@ import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 
 public class CodeGenerator {
 
-	private static final String url = "jdbc:mysql://localhost:3306/english_learning?useSSL=false&serverTimezone=UTC";
+	private static final String url = "jdbc:mysql://114.132.201.185:3306/coca?useSSL=false&serverTimezone=UTC";
 
 	private static final String username = "root";
 
-	private static final String password = "root2024_2025";
+	private static final String password = "Aini2026nian!";
 
 	public static void main(String[] args) {
 		FastAutoGenerator.create(url, username, password)
@@ -21,7 +21,7 @@ public class CodeGenerator {
 				.packageConfig(builder -> builder.parent("com.prometheus.money").entity("entity").mapper("mapper")
 						.service("service").serviceImpl("service.impl").xml("mapper.xml"))
 				// 添加表名称
-				.strategyConfig((scanner, builder) -> builder.addInclude("similarity")
+				.strategyConfig((scanner, builder) -> builder.addInclude("cet")
 						.entityBuilder()
 						.enableLombok()
 						.enableFileOverride()

@@ -4,9 +4,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,21 +18,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.prometheus.money.PrometheusMoneyApplication;
-import com.prometheus.money.entity.Coca;
 import com.prometheus.money.entity.Dialogue;
-import com.prometheus.money.entity.Enwords;
 import com.prometheus.money.entity.Frequency;
 import com.prometheus.money.entity.FrequencyDialogue;
 import com.prometheus.money.entity.Similarity;
 import com.prometheus.money.mapper.FrequencyDialogueMapper;
-import com.prometheus.money.mapper.FrequencyMapper;
 import com.prometheus.money.mapper.SimilarityMapper;
 import com.prometheus.money.service.ICocaService;
 import com.prometheus.money.service.IDialogueService;
 import com.prometheus.money.service.IEnwordsService;
-import com.prometheus.money.service.IFrequencyDialogueService;
 import com.prometheus.money.service.IFrequencyService;
-import com.prometheus.money.service.ISimilarityService;
 
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.Levenshtein;
@@ -51,13 +44,7 @@ public class FrequencyTest {
 	@Autowired
 	private IDialogueService dialogueService;
 	@Autowired
-	private IFrequencyDialogueService frequencyDialogueService;
-	@Autowired
-	private FrequencyMapper frequencyMapper;
-	@Autowired
 	private FrequencyDialogueMapper frequencyDialogueMapper;
-	@Autowired
-	private ISimilarityService similarityService;
 	@Autowired
 	private SimilarityMapper similarityMapper;
 
@@ -65,9 +52,7 @@ public class FrequencyTest {
 	void Dothing() {
 		List<Frequency> frequencyList = frequencyService.list();
 		List<Dialogue> dialogueList = dialogueService.list();
-
 		List<FrequencyDialogue> batchInsert = new ArrayList<FrequencyDialogue>();
-
 		for (Frequency frequency : frequencyList) {
 			System.out.println(frequency.getId());
 			String word = frequency.getWord().toLowerCase();
@@ -83,27 +68,39 @@ public class FrequencyTest {
 						FrequencyDialogue frequencyDialogue = new FrequencyDialogue();
 						BeanUtils.copyProperties(dialogue, frequencyDialogue);
 						frequencyDialogue.setFrequencyId(frequency.getId());
-						frequencyDialogue.setId(null);
-						// frequencyDialogueService.batchin(frequencyDialogue);
 						batchInsert.add(frequencyDialogue);
-						;
+
 					}
 				}
 				if (batchInsert.size() >= 5000) {
-					// frequencyDialogueMapper.batchInsert(batchInsert);
+					frequencyDialogueMapper.batchInsert(batchInsert);
 					batchInsert = new ArrayList<>();
 				}
 			}
 		}
-		// frequencyDialogueMapper.batchInsert(batchInsert);
+		frequencyDialogueMapper.batchInsert(batchInsert);
 	}
+	
+	
+	
+	@Test
+	void Dothings() {
+		String symbol1 = ".,?';:`~!@#$%^&*()-_=+*";
+		String symbol2 = "。，？；：·~！@#￥%&*（）——-=+*";
+		System.out.println(symbol1.length());
+		System.out.println(symbol2.length());
+		
+	}
+	
+	
+
 	@Test
 	void similarity() {
 		Instant start = Instant.now();
-		
+
 		CountDownLatch countDownLath = new CountDownLatch(20);
 		List<Frequency> frequencyList = frequencyService.list();
-		System.out.println("=============="+frequencyList.size());
+		System.out.println("==============" + frequencyList.size());
 		JaroWinkler jw = new JaroWinkler();
 		Levenshtein levenshtein = new Levenshtein();
 
@@ -113,43 +110,40 @@ public class FrequencyTest {
 		int partitionSize = (int) Math.ceil((double) size / 20); // 向上取整
 		List<List<Frequency>> result = new ArrayList<>();
 
-		
 		for (int i = 0; i < size; i += partitionSize) {
 			int end = Math.min(i + partitionSize, size);
 			result.add(new ArrayList<>(frequencyList.subList(i, end)));
 		}
-		//result.add(new ArrayList<>(frequencyList.subList(0, frequencyList.size())));
-		
-		System.out.println("=============="+result.size());
-		System.out.println("=============="+result.get(0).size());
+		// result.add(new ArrayList<>(frequencyList.subList(0, frequencyList.size())));
+
+		System.out.println("==============" + result.size());
+		System.out.println("==============" + result.get(0).size());
 
 		for (List<Frequency> frequencyEachdList : result) {
 
 			executor.submit(() -> {
 				List<Similarity> similarityList = new ArrayList<>();
 				for (Frequency frequency : frequencyEachdList) {
-					//System.out.println(frequency.getId());
-					//System.out.println("==================================");
+					// System.out.println(frequency.getId());
+					// System.out.println("==================================");
 					String sourceWord = frequency.getWord();
-					//System.out.println(sourceWord);
+					// System.out.println(sourceWord);
 					for (Frequency frequencyWord : frequencyList) {
 						String targetWord = frequencyWord.getWord();
 
 						double similarityRate = jw.similarity(sourceWord, targetWord);
 						double distance = levenshtein.distance(targetWord, sourceWord);
 						Double d = Double.valueOf(distance);
-						
-						/*
+
 						if (similarityRate > 0.9 && similarityRate != 1 && d.intValue() <= sourceWord.length()) {
-							
-						}else {
-							 similarityRate = jw.similarity(sourceWord, new StringBuilder(targetWord).reverse().toString());
-							 distance = levenshtein.distance(targetWord, sourceWord);
-							 d = Double.valueOf(distance);
-						}*/
-						
-						
-						
+
+						} else {
+							similarityRate = jw.similarity( new StringBuilder(sourceWord).reverse().toString(),
+									new StringBuilder(targetWord).reverse().toString());
+							distance = levenshtein.distance(targetWord, sourceWord);
+							d = Double.valueOf(distance);
+						}
+
 						if (similarityRate > 0.9 && similarityRate != 1 && d.intValue() <= sourceWord.length()) {
 							Similarity similarity = new Similarity();
 							similarity.setCoca(frequencyWord.getCoca());
@@ -164,7 +158,7 @@ public class FrequencyTest {
 								similarityMapper.insertBatch(similarityList);
 								similarityList = new ArrayList<>();
 							}
-							//System.out.print(targetWord + ";");
+							// System.out.print(targetWord + ";");
 						}
 					}
 					// System.out.println("==================================");
@@ -181,47 +175,41 @@ public class FrequencyTest {
 			e.printStackTrace();
 		}
 		Instant end = Instant.now();
-		
-		System.out.println("运行结束,运行时间是:"+Duration.between(start, end).toSeconds());
-		
+
+		System.out.println("运行结束,运行时间是:" + Duration.between(start, end).toSeconds());
+
 	}
 
 	@Test
 	void contextLoads() {
 
-		List<Enwords> enwordsList = enwordsService.list();
-		Map<String, Enwords> enwordsListMap = new HashMap<>();
-		for (Enwords word : enwordsList) {
-			enwordsListMap.put(word.getWord(), word);
-		}
-		int n = 0;
-		List<Coca> cocaList = cocoService.list();
-		for (Coca coca : cocaList) {
-			if (enwordsListMap.get(coca.getWord()) == null) {
+		Instant start = Instant.now();
 
-				n++;
-			}
+		JaroWinkler jw = new JaroWinkler();
+		Levenshtein levenshtein = new Levenshtein();
+
+		// System.out.println(frequency.getId());
+		// System.out.println("==================================");
+		String sourceWord = "clown";
+
+		String targetWord = "crowns";
+
+		double similarityRate = jw.similarity(sourceWord, targetWord);
+		double distance = levenshtein.distance(targetWord, sourceWord);
+		Double d = Double.valueOf(distance);
+
+		if (similarityRate > 0.9 && similarityRate != 1 && d.intValue() <= sourceWord.length()) {
+
+		} else {
+			similarityRate = jw.similarity(new StringBuilder(sourceWord).reverse().toString(), new StringBuilder(targetWord).reverse().toString());
+			distance = levenshtein.distance(targetWord, sourceWord);
+			d = Double.valueOf(distance);
 		}
-		System.out.println("============================");
-		System.out.println(n);
-		System.out.println("============================");
-		/*
-		 * List<Frequency> frequencyList = frequencyService.list(); String regex =
-		 * "[^a-zA-Z]"; Pattern pattern = Pattern.compile(regex); // 用于存储提取的非英文字符
-		 * HashSet<String> nonEnglishChars = new HashSet<>();
-		 * 
-		 * for(Frequency frequency :frequencyList) {
-		 * 
-		 * Matcher matcher = pattern.matcher(frequency.getWord());
-		 * 
-		 * 
-		 * // 提取非英文字符 while (matcher.find()) { nonEnglishChars.add(matcher.group()); } }
-		 * System.out.println("==================开始输出=================="); for (String
-		 * character : nonEnglishChars) { System.out.println(character); }
-		 * System.out.println("==================输出Over==================");
-		 * 
-		 * }
-		 */
+
+		if (similarityRate > 0.9 && similarityRate != 1 && d.intValue() <= sourceWord.length()) {
+
+		}
+
 	}
 
 }

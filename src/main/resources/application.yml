@@ -3,6 +3,12 @@ spring:
     active: dev
   application:
     name: money_backend
+  thymeleaf:
+    cache: false      # 开发阶段关闭缓存
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+
 # 日志级别
 logging:
   config: classpath:logback-spring-local.xml

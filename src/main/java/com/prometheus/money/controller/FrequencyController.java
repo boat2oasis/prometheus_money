@@ -61,7 +61,8 @@ public class FrequencyController {
 	public Res<Map<String, List<LogRecord>>> logList() {
 		return Res.success(logMap);
 	}
-    @ResponseBody
+
+	@ResponseBody
 	@PostMapping("frequency/list")
 	public Res<Page<Frequency>> listFrequency(@RequestBody DialogueRe dialogueRe, HttpServletRequest request) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -146,31 +147,52 @@ public class FrequencyController {
 		return Res.success(dialogueList);
 	}
 
-	@GetMapping("frequency")
+	@GetMapping(value = { "frequency", "frequency/{page}/{size}", "frequency/{page}/{size}/{type}",
+			"frequency/{page}/{size}/{type}/{keyword}" })
 	public String listFrequencyPage(
-			@org.springframework.web.bind.annotation.RequestParam(defaultValue = "1") Integer page,
-			@org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") Integer size,
-			@org.springframework.web.bind.annotation.RequestParam(required = false) String keyword,
-			@org.springframework.web.bind.annotation.RequestParam(required = false) String type,
+			@org.springframework.web.bind.annotation.PathVariable(required = false) Integer page,
+			@org.springframework.web.bind.annotation.PathVariable(required = false) Integer size,
+			@org.springframework.web.bind.annotation.PathVariable(required = false) String type,
+			@org.springframework.web.bind.annotation.PathVariable(required = false) String keyword,
+			@org.springframework.web.bind.annotation.RequestParam(value = "keyword", required = false) String reqKeyword,
+			@org.springframework.web.bind.annotation.RequestParam(value = "type", required = false) String reqType,
 			org.springframework.ui.Model model) {
+
+		if (page == null) {
+			page = 1;
+		}
+		if (size == null) {
+			size = 10;
+		}
+
+		// Priority: Path Variable > Request Param
+		String effectiveType = type;
+		if (effectiveType == null) {
+			effectiveType = reqType;
+		}
+
+		String effectiveKeyword = keyword;
+		if (effectiveKeyword == null) {
+			effectiveKeyword = reqKeyword;
+		}
 
 		Page<Frequency> pages = new Page<>(page, size);
 		LambdaQueryWrapper<Frequency> wrapper = new LambdaQueryWrapper<>();
 
-		if (!StringUtils.isBlank(keyword)) {
-			String key = keyword.trim().replace(" ", "");
-			if (!StringUtils.isBlank(type)) {
-				if ("all".equals(type)) {
+		if (!StringUtils.isBlank(effectiveKeyword)) {
+			String key = effectiveKeyword.trim().replace(" ", "");
+			if (!StringUtils.isBlank(effectiveType)) {
+				if ("all".equals(effectiveType) || "general".equals(effectiveType)) {
 					wrapper.like(Frequency::getWord, key);
-				} else if ("after".equals(type)) {
+				} else if ("after".equals(effectiveType) || "suffix".equals(effectiveType)) {
 					wrapper.likeLeft(Frequency::getWord, key);
-				} else if ("before".equals(type)) {
+				} else if ("before".equals(effectiveType) || "prefix".equals(effectiveType)) {
 					wrapper.likeRight(Frequency::getWord, key);
-				} else if ("central".equals(type)) {
+				} else if ("central".equals(effectiveType)) {
 					wrapper.notLikeRight(Frequency::getWord, key)
 							.notLikeLeft(Frequency::getWord, key)
 							.like(Frequency::getWord, key);
-				} else if ("similar".equals(type)) {
+				} else if ("similar".equals(effectiveType) || "similarity".equals(effectiveType)) {
 					LambdaQueryWrapper<Similarity> similaritywrapper = new LambdaQueryWrapper<>();
 					similaritywrapper.eq(Similarity::getFrequencyWord, key);
 					similaritywrapper.orderByDesc(Similarity::getSimilarity);
@@ -195,8 +217,8 @@ public class FrequencyController {
 		Page<Frequency> resultPage = frequencyService.page(pages, wrapper);
 
 		// Highlight keyword
-		if (!StringUtils.isBlank(keyword)) {
-			String key = keyword.trim().replace(" ", "");
+		if (!StringUtils.isBlank(effectiveKeyword)) {
+			String key = effectiveKeyword.trim().replace(" ", "");
 			String targetChar = "<span style=\"color:#d93025;\">" + key + "</span>";
 			for (Frequency frequency : resultPage.getRecords()) {
 				if (frequency.getWord() != null) {
@@ -206,8 +228,8 @@ public class FrequencyController {
 		}
 
 		model.addAttribute("page", resultPage);
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("type", type);
+		model.addAttribute("keyword", effectiveKeyword);
+		model.addAttribute("type", effectiveType);
 
 		return "frequency";
 	}

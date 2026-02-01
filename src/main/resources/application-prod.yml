@@ -13,6 +13,6 @@ spring:
   jackson:
     date-format: yyyy-MM-dd
   elasticsearch:
-    uris: http://127.0.0.1:9200
+    uris: http://114.132.201.185:9200
     username: elastic
     #password: DdoMvP7jyFaOeQ6lG5-k

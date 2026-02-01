@@ -4,7 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>单词大师 | Word & Sentence Master</title>
+    <title>Word & Sentence Master</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/image/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/image/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/image/favicon-16x16.png">
+    <link rel="manifest" href="/image/site.webmanifest">
+
+
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap"
         rel="stylesheet">
@@ -13,313 +20,433 @@
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
-            --primary-color: #4f46e5;
-            --bg-body: #f1f5f9;
-            --soft-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-            --active-tab-bg: #0ea5e9;
+            /* Palette: Indigo/Violet/Blue modern gradient theme */
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-pink: #d93025;
+            --bg-body: #f8fafc;
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --glass-blur: blur(12px);
+
+            /* Shadows for depth */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            --shadow-floating: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-body);
-            color: #1e293b;
-            padding-bottom: 50px;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
+            color: var(--text-main);
+            padding-bottom: 80px;
+            min-height: 100vh;
         }
 
-        /* 顶部背景图 */
+        /* 顶部背景图 - Modern Curved Header */
         .header-bg {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.85) 0%, rgba(59, 130, 246, 0.75) 100%),
-                url('./image/background.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 360px;
+            background: var(--primary-gradient);
+            height: 380px;
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             z-index: 0;
-            border-bottom-right-radius: 50px;
-            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 60px;
+            border-bottom-left-radius: 60px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Decorative circles in header */
+        .header-bg::before,
+        .header-bg::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-bg::before {
+            width: 300px;
+            height: 300px;
+            top: -50px;
+            left: -50px;
+        }
+
+        .header-bg::after {
+            width: 400px;
+            height: 400px;
+            bottom: -100px;
+            right: -100px;
         }
 
         /* 导航栏样式 */
+        .navbar-sticky {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            transition: all 0.3s ease;
+        }
+
         .navbar-custom {
-            position: relative;
-            z-index: 100;
-            padding-top: 20px;
-            padding-bottom: 20px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 10px 0;
         }
 
         .nav-link-custom {
-            color: rgba(255, 255, 255, 0.85) !important;
-            font-weight: 500;
-            font-size: 1.15rem;
-            margin: 0 15px;
-            position: relative;
-            transition: all 0.3s;
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 700;
+            font-size: 1rem;
+            margin: 0 10px;
+            padding: 8px 16px !important;
+            border-radius: 50px;
+            transition: all 0.3s ease;
         }
 
-        .nav-link-custom:hover,
+        .navbar-custom .nav-link-custom {
+            color: var(--text-main) !important;
+        }
+
+        .nav-link-custom:hover {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-custom .nav-link-custom:hover {
+            color: var(--primary-color) !important;
+            background: rgba(99, 102, 241, 0.1);
+        }
+
         .nav-link-custom.active {
-            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff !important;
             font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-custom .nav-link-custom.active {
+            background: var(--primary-gradient);
+            color: #fff !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
         .nav-link-custom::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 3px;
-            bottom: -5px;
-            left: 50%;
-            background-color: #fff;
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-            border-radius: 2px;
-        }
-
-        .nav-link-custom.active::after {
-            width: 20px;
-        }
-
-        .nav-link-custom:hover::after {
-            width: 100%;
-        }
-
-        .navbar-brand-custom {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: white !important;
+            display: none;
+            /* Remove underline style */
         }
 
         /* 主容器 */
         .main-container {
             position: relative;
             z-index: 10;
-            max-width: 900px;
-            margin: 20px auto 40px;
+            max-width: 960px;
+            margin: 40px auto;
             padding: 0 20px;
         }
 
         .page-title {
-            color: white;
+            color: #fff;
             font-family: 'Poppins', sans-serif;
             font-weight: 700;
+            font-size: 2.5rem;
             text-align: center;
             margin-bottom: 10px;
-            margin-top: 20px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-top: 30px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            letter-spacing: -0.5px;
         }
 
-        /* 副标题样式 */
         .page-subtitle {
             color: rgba(255, 255, 255, 0.9);
             text-align: center;
-            font-size: 1.05rem;
-            margin-bottom: 40px;
+            font-size: 1.1rem;
+            margin-bottom: 50px;
             font-weight: 400;
-            letter-spacing: 1px;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
         }
 
-        /* Tab 切换区域 */
+        /* 搜索区域 Glassmorphism */
+        .search-wrapper {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            /* Standard syntax */
+            -webkit-backdrop-filter: var(--glass-blur);
+            /* Safari support */
+            padding: 24px;
+            border-radius: 24px;
+            border: var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            margin-bottom: 20px;
+            display: inline-block;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Tabs */
         .search-mode-tabs {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .mode-tab-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: rgba(255, 255, 255, 0.95);
-            padding: 8px 24px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
+            background: transparent;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--text-secondary);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .mode-tab-btn:hover {
-            background: rgba(255, 255, 255, 0.35);
-            color: white;
+            background: rgba(99, 102, 241, 0.05);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
         }
 
         .mode-tab-btn.active {
-            background: var(--active-tab-bg);
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            transform: translateY(-1px);
+            background: var(--primary-gradient);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
         }
 
-        /* 搜索框样式 */
+        /* Search Input */
         .search-container {
-            background: white;
-            padding: 8px 10px 8px 25px;
-            border-radius: 50px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            padding: 8px 12px 8px 25px;
+            border-radius: 18px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
             display: flex;
             align-items: center;
-            margin-bottom: 40px;
             border: 2px solid transparent;
-            transition: border-color 0.2s;
+            /* Prepare for gradient border trick or solid color */
+            transition: all 0.3s ease;
         }
 
         .search-container:focus-within {
-            border-color: #bae6fd;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            border-color: var(--primary-color);
         }
 
         .search-input {
             flex-grow: 1;
             border: none;
-            padding: 12px 0;
-            font-size: 1.1rem;
+            padding: 10px 0;
+            font-size: 1.15rem;
             outline: none;
-            color: #334155;
+            color: var(--text-main);
             background: transparent;
+            font-weight: 500;
         }
 
         .search-input::placeholder {
-            color: #94a3b8;
+            color: #cbd5e1;
             font-weight: 400;
         }
 
         .btn-search-icon {
-            background: transparent;
-            color: #64748b;
+            background: var(--primary-gradient);
+            color: #fff;
             border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.3rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
         }
 
         .btn-search-icon:hover {
-            color: var(--primary-color);
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.4);
+            color: #fff;
         }
 
-        /* 表格样式 */
+        /* Floating Table Design */
         .card-table {
-            background: white;
-            border-radius: 20px;
+            background: transparent;
+            border-radius: 0;
             border: none;
-            box-shadow: var(--soft-shadow);
-            overflow: hidden;
+            box-shadow: none;
+            overflow: visible;
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            display: none;
+        }
+
+        .table-responsive {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .table {
+            border-collapse: separate;
+            border-spacing: 0 12px;
+            /* Gap between rows */
         }
 
         .table thead th {
-            background: #f8fafc;
-            color: #64748b;
+            background: transparent;
+            color: var(--text-secondary);
             font-weight: 600;
             font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 18px 24px;
+            letter-spacing: 1px;
+            padding: 0 20px 10px 20px;
             border: none;
         }
 
+        .table tbody tr {
+            background: #fff;
+            box-shadow: var(--shadow-sm);
+            border-radius: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            box-shadow: var(--shadow-floating);
+            z-index: 10;
+            position: relative;
+        }
+
         .table tbody td {
-            padding: 20px 24px;
+            padding: 20px;
             vertical-align: middle;
-            border-bottom: 1px solid #f1f5f9;
+            border: none;
+            background: #fff;
+        }
+
+        .table tbody td:first-child {
+            border-top-left-radius: 16px;
+            border-bottom-left-radius: 16px;
+        }
+
+        .table tbody td:last-child {
+            border-top-right-radius: 16px;
+            border-bottom-right-radius: 16px;
         }
 
         .word-text {
             font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #1e293b;
-        }
-
-        .translation-text {
-            display: block;
-            font-size: 0.85rem;
-            color: #64748b;
-            font-weight: 400;
-            margin-top: 2px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
         }
 
         .btn-sentence {
-            background-color: #ecfdf5;
-            color: #059669;
+            background-color: #f0fdf4;
+            color: #16a34a;
             border: none;
-            padding: 8px 16px;
+            padding: 8px 18px;
             border-radius: 50px;
             font-size: 0.85rem;
             font-weight: 600;
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .btn-sentence:hover {
-            background-color: #d1fae5;
-            color: #047857;
+            background-color: #dcfce7;
+            color: #15803d;
             transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(22, 163, 74, 0.1);
         }
 
-        /* --- 修改点：新增文本排名样式 --- */
+        .btn-sentence:disabled {
+            background-color: #f1f5f9;
+            color: #94a3b8;
+            cursor: default;
+            box-shadow: none;
+            transform: none;
+        }
+
         .rank-text-movie {
-            color: #4338ca;
-            font-weight: 700;
+            color: var(--primary-color);
+            font-weight: 800;
+            font-size: 1.1rem;
         }
 
         .rank-text-coca {
-            color: #c2410c;
-            font-weight: 700;
+            color: var(--accent-pink);
+            font-weight: 800;
+            font-size: 1.1rem;
         }
 
         .rank-divider {
             color: #cbd5e1;
-            margin: 0 6px;
+            margin: 0 10px;
             font-weight: 300;
+            font-size: 1.2rem;
+            vertical-align: sub;
         }
 
-        /* 弹窗样式 */
-        .modal-content {
-            border-radius: 20px;
-            border: none;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        .series-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: inline-block;
         }
 
-        .modal-header {
-            border-bottom: 1px solid #f1f5f9;
-            padding: 20px 30px;
+        .en-text {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+            line-height: 1.5;
         }
 
-        .modal-body {
-            padding: 0;
-        }
-
-        .sentence-item {
-            padding: 20px 30px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .sentence-item:last-child {
-            border-bottom: none;
-        }
-
-        .en-sentence {
-            font-weight: 500;
-            color: #1e293b;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .cn-sentence {
-            color: #64748b;
+        .cn-text {
+            color: var(--text-secondary);
             font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* 搜索匹配高亮样式 - Bold matched words */
+        .text-dark span[style*="color"],
+        .text-dark font[color],
+        span[style*="#d93025"],
+        span[style*="red"],
+        .highlight {
+            color: var(--accent-pink) !important;
+            font-weight: 700 !important;
+        }
+
+        /* Section Headings */
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
         }
     </style>
 </head>
@@ -328,15 +455,15 @@
 
     <div class="header-bg"></div>
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
-        <div class="container">
-            <a class="navbar-brand navbar-brand-custom" href="#">
-                <i class="bi bi-mortarboard-fill me-2"></i>单词大师
+    <nav class="navbar navbar-expand-lg navbar-light navbar-sticky">
+        <div class="container" style="max-width: 960px; padding: 0 20px;">
+            <a class="navbar-brand navbar-brand-custom" href="#" style="margin-right: 0;">
+
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse ms-lg-4" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link nav-link-custom active" href="/"
                             onclick="setActive(this)">首页</a></li>
@@ -347,9 +474,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="d-none d-lg-block">
-                <button class="btn btn-outline-light rounded-pill px-4 btn-sm">登录</button>
-            </div>
+
         </div>
     </nav>
 
@@ -357,10 +482,15 @@
         <h1 class="page-title">词频与例句数据库</h1>
         <p class="page-subtitle">COCA词频 / 电影词频 / 前缀后缀查询</p>
 
-        <div class="search-mode-tabs">
-            <button class="mode-tab-btn active" onclick="switchMode('general', this)">🔍 智能查询</button>
-            <button class="mode-tab-btn" onclick="switchMode('prefix', this)">🔤 前缀 (Prefix)</button>
-            <button class="mode-tab-btn" onclick="switchMode('suffix', this)">🔚 后缀 (Suffix)</button>
+        <div class="text-center">
+            <div class="search-wrapper">
+                <div class="search-mode-tabs" style="margin-bottom: 0;">
+                    <button class="mode-tab-btn active" onclick="switchMode('general', this)">🔍 词频</button>
+                    <button class="mode-tab-btn" onclick="switchMode('prefix', this)">🔤 前缀 (Prefix)</button>
+                    <button class="mode-tab-btn" onclick="switchMode('suffix', this)">🔚 后缀 (Suffix)</button>
+                    <button class="mode-tab-btn" onclick="switchMode('similarity', this)">≈ 相似 (Similar)</button>
+                </div>
+            </div>
         </div>
 
         <div class="search-container">
@@ -375,26 +505,1438 @@
             </button>
         </div>
 
+        <!-- Suffix Section -->
+        <div class="mt-5 mb-4">
+            <h3 class="fw-bold text-dark mb-2" style="font-family: 'Poppins', sans-serif;">查询单词的电影词频和COCA词频</h3>
+            <p class="text-secondary" style="max-width: 600px;">
+                通过查询单词的词频，可知道单词在日常口语和文学表达中的使用频率。背诵高频单词能让学习事半功倍
+            </p>
+        </div>
+
         <div class="card card-table">
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 25%;">单词 & 释义</th>
-                            <th scope="col">例句</th>
-                            <th scope="col">电影词频</th>
-                            <th scope="col">电影|COCA 排名</th>
+                            <th scope="col" style="width: 15%;">单词</th>
+                            <th scope="col" class="text-center">例句</th>
+                            <th scope="col" class="text-center">电影词频</th>
+                            <th scope="col" class="text-center">电影|COCA 排名</th>
                         </tr>
                     </thead>
-                    <tbody id="resultsBody"></tbody>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">i</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="i" onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=i">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">374609</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">1</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">8</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">you</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="you" onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=you">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">350983</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">2</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">9</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">the</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="the" onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=the">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">203739</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">3</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">1</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">to</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="to" onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=to">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">191712</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">4</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">6</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">it</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="it" onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=it">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">157758</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">7</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">10</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">that</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="that" onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=that">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">125420</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">8</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">12</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">and</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="and" onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=and">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">120101</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">9</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">3</span>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
+        </div>
 
-            <div id="noResults" class="text-center py-5 text-muted" style="display: none;">
-                <i class="bi bi-inbox fs-1 d-block mb-2 opacity-25"></i>
-                未找到相关单词
+
+
+
+        <!-- Prefix Section -->
+        <div class="mt-5 mb-4">
+            <h3 class="fw-bold text-dark mb-2" style="font-family: 'Poppins', sans-serif;">通过前缀查询单词: <span
+                    class="text-primary">pro-举例</span></h3>
+            <p class="text-secondary" style="max-width: 600px;">
+                通过前缀查询相同前缀的单词，实现分组记单词，并判断是否所有前缀相同的单词发音都相同
+            </p>
+        </div>
+
+        <div class="card card-table">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 15%;">单词</th>
+                            <th scope="col" class="text-center">例句</th>
+                            <th scope="col" class="text-center">电影词频</th>
+                            <th scope="col" class="text-center">电影|COCA 排名</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2"><span style="color:#d93025;">pro</span>bably</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="&lt;span style=&quot;color:#d93025;&quot;&gt;pro&lt;/span&gt;bably"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=%3Cspan%20style%3D%22color:%23d93025;%22%3Epro%3C/span%3Ebably">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">3156</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">289</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">335</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2"><span style="color:#d93025;">pro</span>blem</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="&lt;span style=&quot;color:#d93025;&quot;&gt;pro&lt;/span&gt;blem"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=%3Cspan%20style%3D%22color:%23d93025;%22%3Epro%3C/span%3Eblem">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">2722</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">329</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">170</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2"><span style="color:#d93025;">pro</span>mise</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="&lt;span style=&quot;color:#d93025;&quot;&gt;pro&lt;/span&gt;mise"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=%3Cspan%20style%3D%22color:%23d93025;%22%3Epro%3C/span%3Emise">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">1375</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">562</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">1132</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2"><span style="color:#d93025;">pro</span>ud</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="&lt;span style=&quot;color:#d93025;&quot;&gt;pro&lt;/span&gt;ud"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=%3Cspan%20style%3D%22color:%23d93025;%22%3Epro%3C/span%3Eud">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">944</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">747</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">1540</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2"><span style="color:#d93025;">pro</span>tect</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="&lt;span style=&quot;color:#d93025;&quot;&gt;pro&lt;/span&gt;tect"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=%3Cspan%20style%3D%22color:%23d93025;%22%3Epro%3C/span%3Etect">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">684</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">940</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">696</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2"><span style="color:#d93025;">pro</span>fessor</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="&lt;span style=&quot;color:#d93025;&quot;&gt;pro&lt;/span&gt;fessor"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=%3Cspan%20style%3D%22color:%23d93025;%22%3Epro%3C/span%3Efessor">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">622</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">1017</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">846</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2"><span style="color:#d93025;">pro</span>ve</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="&lt;span style=&quot;color:#d93025;&quot;&gt;pro&lt;/span&gt;ve"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=%3Cspan%20style%3D%22color:%23d93025;%22%3Epro%3C/span%3Eve">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">547</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">1102</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">757</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2"><span style="color:#d93025;">pro</span>ject</div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="&lt;span style=&quot;color:#d93025;&quot;&gt;pro&lt;/span&gt;ject"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=%3Cspan%20style%3D%22color:%23d93025;%22%3Epro%3C/span%3Eject">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">383</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">1438</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">499</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
+
+
+
+
+
+
+        <!-- Suffix Section -->
+        <div class="mt-5 mb-4">
+            <h3 class="fw-bold text-dark mb-2" style="font-family: 'Poppins', sans-serif;">通过后缀查询单词: <span
+                    class="text-danger">-ious举例</span></h3>
+            <p class="text-secondary" style="max-width: 600px;">
+                通过后缀查询单词，实现复习或者是多学一个单词的效果
+            </p>
+        </div>
+
+        <div class="card card-table">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 15%;">单词</th>
+                            <th scope="col" class="text-center">例句</th>
+                            <th scope="col" class="text-center">电影词频</th>
+                            <th scope="col" class="text-center">电影|COCA 排名</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">ser<span style="color:#d93025;">ious</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="ser&lt;span style=&quot;color:#d93025;&quot;&gt;ious&lt;/span&gt;"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=ser%3Cspan%20style%3D%22color:%23d93025;%22%3Eious%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">1285</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">588</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">719</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">delic<span style="color:#d93025;">ious</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="delic&lt;span style=&quot;color:#d93025;&quot;&gt;ious&lt;/span&gt;"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=delic%3Cspan%20style%3D%22color:%23d93025;%22%3Eious%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">355</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">1510</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">3693</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">obv<span style="color:#d93025;">ious</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="obv&lt;span style=&quot;color:#d93025;&quot;&gt;ious&lt;/span&gt;"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=obv%3Cspan%20style%3D%22color:%23d93025;%22%3Eious%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">264</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">1855</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">1470</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">cur<span style="color:#d93025;">ious</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="cur&lt;span style=&quot;color:#d93025;&quot;&gt;ious&lt;/span&gt;"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=cur%3Cspan%20style%3D%22color:%23d93025;%22%3Eious%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">232</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">2055</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">2565</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">hilar<span style="color:#d93025;">ious</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="hilar&lt;span style=&quot;color:#d93025;&quot;&gt;ious&lt;/span&gt;"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=hilar%3Cspan%20style%3D%22color:%23d93025;%22%3Eious%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">199</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">2294</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">5496</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">prec<span style="color:#d93025;">ious</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="prec&lt;span style=&quot;color:#d93025;&quot;&gt;ious&lt;/span&gt;"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=prec%3Cspan%20style%3D%22color:%23d93025;%22%3Eious%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">160</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">2670</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">3348</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">suspic<span style="color:#d93025;">ious</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="suspic&lt;span style=&quot;color:#d93025;&quot;&gt;ious&lt;/span&gt;"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=suspic%3Cspan%20style%3D%22color:%23d93025;%22%3Eious%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">121</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">3260</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">4084</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">myster<span style="color:#d93025;">ious</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="myster&lt;span style=&quot;color:#d93025;&quot;&gt;ious&lt;/span&gt;"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=myster%3Cspan%20style%3D%22color:%23d93025;%22%3Eious%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">111</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">3456</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">3692</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">fur<span style="color:#d93025;">ious</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="fur&lt;span style=&quot;color:#d93025;&quot;&gt;ious&lt;/span&gt;"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=fur%3Cspan%20style%3D%22color:%23d93025;%22%3Eious%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">76</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">4500</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">4901</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">prev<span style="color:#d93025;">ious</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none"
+                                        data-word="prev&lt;span style=&quot;color:#d93025;&quot;&gt;ious&lt;/span&gt;"
+                                        onclick="copyToClipboard(this, this.getAttribute('data-word'))"
+                                        title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none"
+                                    href="/dialogue?keyword=prev%3Cspan%20style%3D%22color:%23d93025;%22%3Eious%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">75</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">4538</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">1089</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- Suffix Section -->
+        <div class="mt-5 mb-4">
+            <h3 class="fw-bold text-dark mb-2" style="font-family: 'Poppins', sans-serif;">
+                多个单词查句子，中文释意和英文同时查询，固定搭配和正宗英语最好的学习方式</h3>
+            <p class="text-secondary" style="max-width: 600px;">
+                输入come to think of it，可以查询到包含这个短语的句子，并且高亮显示。同时还支持收入中文查询。
+            </p>
+        </div>
+
+        <div class="card card-table">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 15%;">剧集</th>
+                            <th scope="col" style="width: 42%;">英文</th>
+                            <th scope="col" style="width: 43%;">中文</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="series-text">生活大爆炸</div>
+                            </td>
+                            <td>
+                                <div class="en-text"><span style="color:#d93025;font-size:16px">Come</span> <span
+                                        style="color:#d93025;font-size:16px">to</span> <span
+                                        style="color:#d93025;font-size:16px">think</span> <span
+                                        style="color:#d93025;font-size:16px">of</span> <span
+                                        style="color:#d93025;font-size:16px">it</span>, I would!</div>
+                            </td>
+                            <td>
+                                <div class="cn-text"><span style="color:#d93025;font-size:16px">细</span><span
+                                        style="color:#d93025;font-size:16px">想</span>一下 我还真<span
+                                        style="color:#d93025;font-size:16px">想</span>呢</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">硅谷</div>
+                            </td>
+                            <td>
+                                <div class="en-text">And "Man," <span style="color:#d93025;font-size:16px">come</span>
+                                    <span style="color:#d93025;font-size:16px">to</span> <span
+                                        style="color:#d93025;font-size:16px">think</span> <span
+                                        style="color:#d93025;font-size:16px">of</span> <span
+                                        style="color:#d93025;font-size:16px">it</span>.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">仔<span style="color:#d93025;font-size:16px">细</span><span
+                                        style="color:#d93025;font-size:16px">想</span><span
+                                        style="color:#d93025;font-size:16px">想</span>的话 还要强调"男"人</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">摩登家庭</div>
+                            </td>
+                            <td>
+                                <div class="en-text"><span style="color:#d93025;font-size:16px">Come</span> <span
+                                        style="color:#d93025;font-size:16px">to</span> <span
+                                        style="color:#d93025;font-size:16px">think</span> <span
+                                        style="color:#d93025;font-size:16px">of</span> <span
+                                        style="color:#d93025;font-size:16px">it</span>, there were lots <span
+                                        style="color:#d93025;font-size:16px">of</span> fathers and sons there.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">仔<span style="color:#d93025;font-size:16px">细</span><span
+                                        style="color:#d93025;font-size:16px">想</span><span
+                                        style="color:#d93025;font-size:16px">想</span>那里有好多父子</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">老友记</div>
+                            </td>
+                            <td>
+                                <div class="en-text">You know,<span style="color:#d93025;font-size:16px">come</span>
+                                    <span style="color:#d93025;font-size:16px">to</span> <span
+                                        style="color:#d93025;font-size:16px">think</span> <span
+                                        style="color:#d93025;font-size:16px">of</span> <span
+                                        style="color:#d93025;font-size:16px">it</span>,<span
+                                        style="color:#d93025;font-size:16px">it</span> does feel rubella-like.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">仔<span style="color:#d93025;font-size:16px">细</span><span
+                                        style="color:#d93025;font-size:16px">想</span><span
+                                        style="color:#d93025;font-size:16px">想</span> 倒确实有点像是风疹</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">绝命毒师</div>
+                            </td>
+                            <td>
+                                <div class="en-text"><span style="color:#d93025;font-size:16px">Come</span> <span
+                                        style="color:#d93025;font-size:16px">to</span> <span
+                                        style="color:#d93025;font-size:16px">think</span> <span
+                                        style="color:#d93025;font-size:16px">of</span> <span
+                                        style="color:#d93025;font-size:16px">it</span>, I barely know who Boz Scaggs is.
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cn-text">仔<span style="color:#d93025;font-size:16px">细</span><span
+                                        style="color:#d93025;font-size:16px">想</span><span
+                                        style="color:#d93025;font-size:16px">想</span> 我也不知道伯兹史卡斯</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">老友记</div>
+                            </td>
+                            <td>
+                                <div class="en-text">You know,<span style="color:#d93025;font-size:16px">come</span>
+                                    <span style="color:#d93025;font-size:16px">to</span> <span
+                                        style="color:#d93025;font-size:16px">think</span> <span
+                                        style="color:#d93025;font-size:16px">of</span> <span
+                                        style="color:#d93025;font-size:16px">it</span>, the capital <span
+                                        style="color:#d93025;font-size:16px">of</span> Peru is "Vtox."</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">我仔<span style="color:#d93025;font-size:16px">细</span><span
+                                        style="color:#d93025;font-size:16px">想</span><span
+                                        style="color:#d93025;font-size:16px">想</span>之后秘鲁的首都应该叫"VTOX"</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">绝望主妇</div>
+                            </td>
+                            <td>
+                                <div class="en-text">You know, <span style="color:#d93025;font-size:16px">come</span>
+                                    <span style="color:#d93025;font-size:16px">to</span> <span
+                                        style="color:#d93025;font-size:16px">think</span> <span
+                                        style="color:#d93025;font-size:16px">of</span> <span
+                                        style="color:#d93025;font-size:16px">it</span>, a little prayer might not be
+                                    such a bad idea after all.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">仔<span style="color:#d93025;font-size:16px">细</span><span
+                                        style="color:#d93025;font-size:16px">想</span>一下祈祷也许不是什么坏主意</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
+        <!-- Suffix Section -->
+        <div class="mt-5 mb-4">
+            <h3 class="fw-bold text-dark mb-2" style="font-family: 'Poppins', sans-serif;">通过中文查询英文，学习最正宗的最常用的表达</h3>
+            <p class="text-secondary" style="max-width: 600px;">
+                输入中文词语「创伤」，可查询包含对应英文表达的原汁原味英文句子，并对关键词进行高亮显示。
+                通过真实英文语境，帮助用户理解「创伤」在不同语境下对应的准确英文表达（如 trauma、wound、aftermath 等），从而掌握地道用法。 </p>
+        </div>
+
+        <div class="card card-table">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 15%;">剧集</th>
+                            <th scope="col" style="width: 42%;">英文</th>
+                            <th scope="col" style="width: 43%;">中文</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="series-text">无耻之徒</div>
+                            </td>
+                            <td>
+                                <div class="en-text">"Traumatic transformation"?</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">"<span style="color:#d93025;font-size:16px">创</span><span
+                                        style="color:#d93025;font-size:16px">伤</span>性转变"</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">怪奇物语</div>
+                            </td>
+                            <td>
+                                <div class="en-text">From trauma.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">不被<span style="color:#d93025;font-size:16px">创</span><span
+                                        style="color:#d93025;font-size:16px">伤</span>侵扰</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">吸血鬼日记</div>
+                            </td>
+                            <td>
+                                <div class="en-text">You've been through a trauma.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">你经历了<span style="color:#d93025;font-size:16px">创</span><span
+                                        style="color:#d93025;font-size:16px">伤</span></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">瑞克和莫蒂</div>
+                            </td>
+                            <td>
+                                <div class="en-text">I was traumatized, Summer.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">我受到了<span style="color:#d93025;font-size:16px">创</span><span
+                                        style="color:#d93025;font-size:16px">伤</span> Summer</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">绝望主妇</div>
+                            </td>
+                            <td>
+                                <div class="en-text">That was a traumatic experience.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">那是个<span style="color:#d93025;font-size:16px">创</span><span
+                                        style="color:#d93025;font-size:16px">伤</span>性事件</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">怪奇物语</div>
+                            </td>
+                            <td>
+                                <div class="en-text">we've got shared trauma.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">我们共同经历过<span style="color:#d93025;font-size:16px">创</span><span
+                                        style="color:#d93025;font-size:16px">伤</span></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">无耻之徒</div>
+                            </td>
+                            <td>
+                                <div class="en-text">It's not that traumatic.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">没你描述的那么<span style="color:#d93025;font-size:16px">创</span><span
+                                        style="color:#d93025;font-size:16px">伤</span></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">绝望主妇</div>
+                            </td>
+                            <td>
+                                <div class="en-text">Those scars healed a long time ago.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">那些<span style="color:#d93025;font-size:16px">创</span><span
+                                        style="color:#d93025;font-size:16px">伤</span>早就愈合了</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">绝望主妇</div>
+                            </td>
+                            <td>
+                                <div class="en-text">that's healing for me.</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">治愈了我心中的<span style="color:#d93025;font-size:16px">创</span><span
+                                        style="color:#d93025;font-size:16px">伤</span></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="series-text">瑞克和莫蒂</div>
+                            </td>
+                            <td>
+                                <div class="en-text">That was really traumatizing!</div>
+                            </td>
+                            <td>
+                                <div class="cn-text">我的心灵受到了<span style="color:#d93025;font-size:16px">创</span><span
+                                        style="color:#d93025;font-size:16px">伤</span></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
+
+         <!-- Suffix Section -->
+        <div class="mt-5 mb-4">
+            <h3 class="fw-bold text-dark mb-2" style="font-family: 'Poppins', sans-serif;">更好的学习自然拼读和特例</h3>
+            <p class="text-secondary" style="max-width: 600px;">
+                lyze的发音和lize一样，那么lyze有哪些单词呢？lize有哪些单词呢？通过查询即可知道。 </p>
+        </div>
+
+        <div class="card card-table">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 15%;">单词</th>
+                            <th scope="col" class="text-center">例句</th>
+                            <th scope="col" class="text-center">电影词频</th>
+                            <th scope="col" class="text-center">电影|COCA 排名</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">ana<span style="color:#d93025;">lyze</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="ana&lt;span style=&quot;color:#d93025;&quot;&gt;lyze&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=ana%3Cspan%20style%3D%22color:%23d93025;%22%3Elyze%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">18</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">11180</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">2054</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">psychoana<span style="color:#d93025;">lyze</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="psychoana&lt;span style=&quot;color:#d93025;&quot;&gt;lyze&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=psychoana%3Cspan%20style%3D%22color:%23d93025;%22%3Elyze%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">6</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">21788</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">35967</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">para<span style="color:#d93025;">lyze</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="para&lt;span style=&quot;color:#d93025;&quot;&gt;lyze&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=para%3Cspan%20style%3D%22color:%23d93025;%22%3Elyze%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">3</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">30088</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">7189</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">overana<span style="color:#d93025;">lyze</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="overana&lt;span style=&quot;color:#d93025;&quot;&gt;lyze&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=overana%3Cspan%20style%3D%22color:%23d93025;%22%3Elyze%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">2</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">38959</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">48548</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">breatha<span style="color:#d93025;">lyze</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="breatha&lt;span style=&quot;color:#d93025;&quot;&gt;lyze&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=breatha%3Cspan%20style%3D%22color:%23d93025;%22%3Elyze%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">1</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">57198</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">cata<span style="color:#d93025;">lyze</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="cata&lt;span style=&quot;color:#d93025;&quot;&gt;lyze&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=cata%3Cspan%20style%3D%22color:%23d93025;%22%3Elyze%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center"></td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">83256</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">19346</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">reana<span style="color:#d93025;">lyze</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="reana&lt;span style=&quot;color:#d93025;&quot;&gt;lyze&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=reana%3Cspan%20style%3D%22color:%23d93025;%22%3Elyze%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center"></td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">89866</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">36480</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 15%;">单词</th>
+                            <th scope="col" class="text-center">例句</th>
+                            <th scope="col" class="text-center">电影词频</th>
+                            <th scope="col" class="text-center">电影|COCA 排名</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">rea<span style="color:#d93025;">lize</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="rea&lt;span style=&quot;color:#d93025;&quot;&gt;lize&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=rea%3Cspan%20style%3D%22color:%23d93025;%22%3Elize%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">1074</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">666</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">549</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">be<span style="color:#d93025;">lize</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="be&lt;span style=&quot;color:#d93025;&quot;&gt;lize&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=be%3Cspan%20style%3D%22color:%23d93025;%22%3Elize%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">13</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">13335</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">socia<span style="color:#d93025;">lize</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="socia&lt;span style=&quot;color:#d93025;&quot;&gt;lize&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=socia%3Cspan%20style%3D%22color:%23d93025;%22%3Elize%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">12</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">14377</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">7804</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">ferti<span style="color:#d93025;">lize</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="ferti&lt;span style=&quot;color:#d93025;&quot;&gt;lize&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=ferti%3Cspan%20style%3D%22color:%23d93025;%22%3Elize%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">9</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">17008</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">13463</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">char<span style="color:#d93025;">lize</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="char&lt;span style=&quot;color:#d93025;&quot;&gt;lize&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=char%3Cspan%20style%3D%22color:%23d93025;%22%3Elize%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">7</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">19370</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">specia<span style="color:#d93025;">lize</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="specia&lt;span style=&quot;color:#d93025;&quot;&gt;lize&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=specia%3Cspan%20style%3D%22color:%23d93025;%22%3Elize%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">7</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">19866</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">4124</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">visua<span style="color:#d93025;">lize</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="visua&lt;span style=&quot;color:#d93025;&quot;&gt;lize&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=visua%3Cspan%20style%3D%22color:%23d93025;%22%3Elize%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">7</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">19761</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">7649</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">stabi<span style="color:#d93025;">lize</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="stabi&lt;span style=&quot;color:#d93025;&quot;&gt;lize&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=stabi%3Cspan%20style%3D%22color:%23d93025;%22%3Elize%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">6</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">21437</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">5453</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">neutra<span style="color:#d93025;">lize</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="neutra&lt;span style=&quot;color:#d93025;&quot;&gt;lize&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=neutra%3Cspan%20style%3D%22color:%23d93025;%22%3Elize%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">5</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">23823</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">9466</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="word-text me-2">fina<span style="color:#d93025;">lize</span></div>
+                                    <button class="btn btn-sm btn-link text-secondary p-0 text-decoration-none" data-word="fina&lt;span style=&quot;color:#d93025;&quot;&gt;lize&lt;/span&gt;" onclick="copyToClipboard(this, this.getAttribute('data-word'))" title="Copy to clipboard" style="line-height: 1;">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a class="btn-sentence text-decoration-none" href="/dialogue?keyword=fina%3Cspan%20style%3D%22color:%23d93025;%22%3Elize%3C/span%3E">
+                                    查看
+                                </a>
+                            </td>
+                            <td class="fw-medium text-secondary text-center">5</td>
+                            <td class="text-center">
+                                <span class="rank-text-movie">23172</span>
+                                <!-- assuming movie rank is id or not available, using id as placeholder or just leave as is if specific field exists -->
+                                <span class="rank-divider">|</span>
+                                <span class="rank-text-coca">9931</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
     </div>
 
     <div class="modal fade" id="sentenceModal" tabindex="-1" aria-hidden="true">
@@ -423,26 +1965,16 @@
             element.classList.add('active');
         }
 
-        const wordDatabase = [
-            { word: "paranormal", translation: "超自然的", freq: 520, movie_rank: 3000, coca_rank: 4500, sentences: [{ en: "Do you believe in paranormal activity?", cn: "你相信超自然现象吗？" }, { en: "He investigates paranormal events.", cn: "他负责调查超自然事件。" }] },
-            { word: "paradise", translation: "天堂；乐园", freq: 1200, movie_rank: 1500, coca_rank: 2000, sentences: [{ en: "This island is truly a paradise on earth.", cn: "这个岛简直是人间天堂。" }, { en: "They spent their honeymoon in a tropical paradise.", cn: "他们在热带天堂度过了蜜月。" }] },
-            { word: "curious", translation: "好奇的；古怪的", freq: 1500, movie_rank: 1200, coca_rank: 1300, sentences: [{ en: "I was curious to know what would happen next.", cn: "我很好奇接下来会发生什么。" }, { en: "It was a curious coincidence.", cn: "这是一个奇怪的巧合。" }] },
-            { word: "apple", translation: "苹果", freq: 5000, movie_rank: 200, coca_rank: 300, sentences: [{ en: "An apple a day keeps the doctor away.", cn: "一天一苹果，医生远离我。" }] },
-            { word: "application", translation: "应用；申请", freq: 2000, movie_rank: 800, coca_rank: 900, sentences: [{ en: "Have you sent in your job application?", cn: "你递交求职申请了吗？" }, { en: "This application runs on both iOS and Android.", cn: "这个应用程序在 iOS 和 Android 上都能运行。" }] },
-            { word: "action", translation: "行动；动作", freq: 2500, movie_rank: 600, coca_rank: 700, sentences: [{ en: "Actions speak louder than words.", cn: "事实胜于雄辩。" }] }
-        ];
+
 
         let currentSearchType = 'general';
 
-        window.onload = function () {
-            renderTable(wordDatabase);
-        };
 
         function handleEnter(e) { if (e.key === 'Enter') performSearch(); }
 
         function resetData() {
             document.getElementById('searchInput').value = '';
-            performSearch();
+            document.getElementById('searchInput').focus();
         }
 
         function switchMode(type, btnElement) {
@@ -454,58 +1986,21 @@
             if (type === 'general') input.placeholder = "请输入您要查询的内容 (中/英)";
             else if (type === 'prefix') input.placeholder = "请输入单词前缀 (例如: 'para')";
             else if (type === 'suffix') input.placeholder = "请输入单词后缀 (例如: 'tion')";
+            else if (type === 'similarity') input.placeholder = "请输入单词 (例如: 'apple')";
             input.focus();
         }
 
         function performSearch() {
-            const query = document.getElementById('searchInput').value.trim().toLowerCase();
-            let filteredData = [];
-            if (!query) filteredData = [...wordDatabase];
-            else {
-                filteredData = wordDatabase.filter(item => {
-                    const w = item.word.toLowerCase();
-                    const t = item.translation.toLowerCase();
-                    if (currentSearchType === 'prefix') return w.startsWith(query);
-                    else if (currentSearchType === 'suffix') return w.endsWith(query);
-                    else return w.includes(query) || t.includes(query);
-                });
-            }
-            filteredData.sort((a, b) => a.movie_rank - b.movie_rank);
-            renderTable(filteredData);
-        }
-
-        function renderTable(data) {
-            const tbody = document.getElementById('resultsBody');
-            const noResults = document.getElementById('noResults');
-            const tableEl = document.querySelector('.table');
-
-            tbody.innerHTML = '';
-
-            if (data.length === 0) {
-                noResults.style.display = 'block';
-                tableEl.style.display = 'none';
+            const query = document.getElementById('searchInput').value.trim();
+            const type = currentSearchType || 'general';
+            if (query) {
+                window.location.href = `/frequency/1/10/${type}/${encodeURIComponent(query)}`;
             } else {
-                noResults.style.display = 'none';
-                tableEl.style.display = 'table';
+                window.location.href = `/frequency/1/10/${type}`;
             }
-
-            data.forEach(item => {
-                /* 修改点：更新了排名的HTML结构，使用纯文本 + 颜色区分 */
-                const row = `
-                <tr>
-                    <td><div class="word-text">${item.word}</div><span class="translation-text">${item.translation}</span></td>
-                    <td><button class="btn-sentence" onclick="openSentenceModal('${item.word}')"><i class="bi bi-chat-quote-fill me-1"></i> 查看 (${item.sentences.length})</button></td>
-                    <td class="fw-medium text-secondary">${item.freq.toLocaleString()}</td>
-                    <td>
-                        <span class="rank-text-movie">${item.movie_rank}</span>
-                        <span class="rank-divider">|</span>
-                        <span class="rank-text-coca">${item.coca_rank}</span>
-                    </td>
-                </tr>
-            `;
-                tbody.innerHTML += row;
-            });
         }
+
+
 
         function openSentenceModal(wordText) {
             const item = wordDatabase.find(w => w.word === wordText);
@@ -527,6 +2022,21 @@
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.addEventListener('scroll', function () {
+            var navbar = document.querySelector('.navbar');
+            if (window.scrollY > 0) {
+                navbar.classList.add('navbar-custom');
+            } else {
+                navbar.classList.remove('navbar-custom');
+            }
+        });
+
+        // Initial check
+        if (window.scrollY === 0) {
+            document.querySelector('.navbar').classList.remove('navbar-custom');
+        }
+    </script>
 </body>
 
 </html>

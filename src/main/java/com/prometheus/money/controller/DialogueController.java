@@ -20,9 +20,12 @@ import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
 import org.springframework.data.elasticsearch.core.query.highlight.HighlightField;
 import org.springframework.data.elasticsearch.core.query.highlight.HighlightFieldParameters;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.excel.util.StringUtils;
@@ -67,12 +70,58 @@ public class DialogueController {
 	@Autowired
 	private IRequestService requestService;
 
+	@GetMapping(value = { "dialogue", "dialogue/{page}/{size}", "dialogue/{page}/{size}/{keyword}" })
+	public String dialogue(Model model,
+			@org.springframework.web.bind.annotation.PathVariable(required = false) Integer page,
+			@org.springframework.web.bind.annotation.PathVariable(required = false) Integer size,
+			@org.springframework.web.bind.annotation.PathVariable(required = false) String keyword,
+			@org.springframework.web.bind.annotation.RequestParam(value = "page", required = false) Integer reqPage,
+			@org.springframework.web.bind.annotation.RequestParam(value = "size", required = false) Integer reqSize,
+			@org.springframework.web.bind.annotation.RequestParam(value = "keyword", required = false) String reqKeyword,
+			HttpServletRequest request) {
+
+		if (page == null) {
+			page = reqPage != null ? reqPage : 1;
+		}
+		if (size == null) {
+			size = reqSize != null ? reqSize : 10;
+		}
+		String effectiveKeyword = keyword;
+		if (effectiveKeyword == null) {
+			effectiveKeyword = reqKeyword;
+		}
+		if (effectiveKeyword != null) {
+			effectiveKeyword = effectiveKeyword.replace("-", " ");
+		}
+
+		// Log the request (similar to search method)
+		String clientAddress = ClientIpAddress.getClientIpAddress();
+		LogRecord log = new LogRecord();
+		String uri = request.getRequestURI();
+		log.setIp(clientAddress);
+		log.setTime(FORMATTER.format(LocalDateTime.now()));
+		log.setUri(uri);
+		log.setRequestParam("page=" + page + ", size=" + size + ", keyword=" + effectiveKeyword);
+
+		Request requestDatabase = new Request();
+		requestDatabase.setIp(clientAddress);
+		requestDatabase.setRequestParam(log.getRequestParam());
+		requestDatabase.setUri(uri);
+		requestDatabase.setTime(LocalDateTime.now());
+		requestService.save(requestDatabase);
+
+		Page<Dialogue> resultPage = executeSearch(effectiveKeyword, page, size);
+
+		model.addAttribute("page", resultPage);
+		model.addAttribute("keyword", effectiveKeyword);
+
+		return "dialogue";
+	}
+
 	@ResponseBody
 	@PostMapping("dialogue")
 	public Res<Page<Dialogue>> search(@RequestBody DialogueRe dialogueRe, HttpServletRequest request) {
-
-		// Page<Dialogue> pageRequest = new Page<>(page, size);
-
+		// Log the request
 		System.out.println("发送请求===========================");
 
 		String clientAddress = ClientIpAddress.getClientIpAddress();
@@ -83,7 +132,6 @@ public class DialogueController {
 			jsonString = objectMapper.writeValueAsString(dialogueRe);
 			log.setRequestParam(jsonString);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		String uri = request.getRequestURI();
@@ -98,42 +146,49 @@ public class DialogueController {
 		requestDatabase.setTime(LocalDateTime.now());
 		requestService.save(requestDatabase);
 
-		Page<Dialogue> pages = new Page<Dialogue>();
-		pages.setCurrent(dialogueRe.getCurrent() == null ? 0 : dialogueRe.getCurrent());
-		pages.setSize(dialogueRe.getSize() == null ? 0 : dialogueRe.getSize());
-		// String key = "come to think of it";
+		int page = dialogueRe.getCurrent() == null ? 1 : dialogueRe.getCurrent(); // Default to 1 if null, logic inside
+																					// executeSearch handles 0-index
+																					// conversion
+		int size = dialogueRe.getSize() == null ? 10 : dialogueRe.getSize();
+		// If the incoming request uses 0 for the first page, we might need to adjust,
+		// but typically we standardize on implementation.
+		// If current legacy uses 0-based, executeSearch taking 1-based might break it
+		// if we don't adjust.
+		// Assuming legacy calls might send 0.
+		if (page == 0)
+			page = 1;
+
+		Page<Dialogue> pages = executeSearch(dialogueRe.getKey(), page, size);
+		return Res.success(pages);
+	}
+
+	private Page<Dialogue> executeSearch(String keyword, int page, int size) {
+		Page<Dialogue> pages = new Page<>();
+		pages.setCurrent(page);
+		pages.setSize(size);
 
 		String queryString = "{ \"match\": { \"sentence\": { \"query\": \"come to think of it\",\"operator\": \"and\" } } }";
 
-		if (StringUtils.isBlank(dialogueRe.getKey())) {
+		if (StringUtils.isBlank(keyword)) {
 			queryString = "{ \"match_all\": {} }";
-		} else {
-
 		}
-		String chinese = extractChinese(dialogueRe.getKey());
-		String english = extractEnglish(dialogueRe.getKey());
+
+		String chinese = extractChinese(keyword);
+		String english = extractEnglish(keyword);
 
 		List<HighlightField> highlightFieldlist = new ArrayList<>();
 
 		// 动态添加英文条件
-
 		String expression = """
 				     {
 				       "bool": {
 				           "must": [
-
-
-
 				""";
 
 		String highLightQuery = expression;
-
 		boolean searchEnglish = false;
 
 		if (!StringUtils.isBlank(english)) {
-			// Query strictQuery = QueryBuilders.matchPhraseQuery("content", "搜索词").slop(0);
-			// // 或 termQuery
-
 			expression = expression + """
 					  {
 					"match_phrase": {
@@ -146,7 +201,7 @@ public class DialogueController {
 					         """.formatted(english);
 
 			highLightQuery = """
-							  {
+					          {
 					"match": {
 					                   "sentence": {
 					                       "query": "%s",
@@ -154,7 +209,6 @@ public class DialogueController {
 					                   }
 					               }
 					               }
-
 					           """.formatted(english);
 
 			HighlightFieldParameters highlightParameters = HighlightFieldParameters.builder()
@@ -162,11 +216,10 @@ public class DialogueController {
 					.withPostTags("</span>") // 高亮后缀标签
 					.withHighlightQuery(new StringQuery(highLightQuery))
 					.build();
-			HighlightField highlightField = new HighlightField("sentence", highlightParameters); // 替换为你要高亮显示的字段名
+			HighlightField highlightField = new HighlightField("sentence", highlightParameters);
 			highlightFieldlist.add(highlightField);
 
 			searchEnglish = true;
-			// }
 		}
 
 		// 动态添加中文条件
@@ -177,7 +230,7 @@ public class DialogueController {
 					.withPreTags("<span style=\"color:#d93025;font-size:16px\">") // 高亮前缀标签
 					.withPostTags("</span>") // 高亮后缀标签
 					.build();
-			HighlightField highlightField = new HighlightField("chinese", highlightParameters); // 替换为你要高亮显示的字段名
+			HighlightField highlightField = new HighlightField("chinese", highlightParameters);
 			highlightFieldlist.add(highlightField);
 			String addQuote = "";
 			if (searchEnglish) {
@@ -193,32 +246,30 @@ public class DialogueController {
 					               }
 					               }
 					         """.formatted(chinese);
-
 			searchChinese = true;
 		}
 
 		expression = expression + """
-					            ]
-					        }
-					    }
+				                ]
+				            }
+				        }
 				""";
 		if (!searchChinese && !searchEnglish) {
 			expression = """
-								               {
+					                           {
 					  "match_all": {}
 					}
-								""";
+					            """;
 		}
 
 		Highlight highlight = new Highlight(highlightFieldlist);
-
 		HighlightQuery highlightQuery = new HighlightQuery(highlight, Dialogue.class);
 
-		// Query query = new CriteriaQueryBuilder(criteria).build();
+		// Calculate 0-based page index for Elasticsearch
+		int pageIndex = (page > 0) ? page - 1 : 0;
 
 		Query query2 = new StringQuery(expression);
-		query2.setPageable(
-				PageRequest.of(dialogueRe.getCurrent() == null ? 0 : dialogueRe.getCurrent(), dialogueRe.getSize()));
+		query2.setPageable(PageRequest.of(pageIndex, size));
 		if (highlightFieldlist.size() > 0) {
 			query2.setHighlightQuery(highlightQuery);
 		}
@@ -226,11 +277,11 @@ public class DialogueController {
 		SearchHits<Dialogue> searchHits = elasticsearchOperations.search(query2, Dialogue.class);
 
 		for (SearchHit<Dialogue> searchHit : searchHits) {
-			List<String> highlightedTexts = searchHit.getHighlightField("sentence"); // 替换为你要高亮显示的字段名
+			List<String> highlightedTexts = searchHit.getHighlightField("sentence");
 			if (highlightedTexts != null && highlightedTexts.size() > 0) {
 				searchHit.getContent().setSentence(highlightedTexts.get(0));
 			}
-			List<String> highlightedTextsChinese = searchHit.getHighlightField("chinese"); // 替换为你要高亮显示的字段名
+			List<String> highlightedTextsChinese = searchHit.getHighlightField("chinese");
 			if (highlightedTextsChinese != null && highlightedTextsChinese.size() > 0) {
 				searchHit.getContent().setChinese(highlightedTextsChinese.get(0));
 			}
@@ -239,7 +290,7 @@ public class DialogueController {
 		List<Dialogue> resultList = searchHits.stream().map(hit -> hit.getContent()).collect(Collectors.toList());
 		pages.setTotal(searchHits.getTotalHits());
 		pages.setRecords(resultList);
-		return Res.success(pages);
+		return pages;
 	}
 
 	public static String extractChinese(String text) {
@@ -251,6 +302,9 @@ public class DialogueController {
 	}
 
 	private static String extractByRegex(String text, String regex) {
+		if (text == null) {
+			return "";
+		}
 		StringBuilder result = new StringBuilder();
 		Matcher matcher = Pattern.compile(regex).matcher(text);
 		while (matcher.find()) {

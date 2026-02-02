@@ -413,6 +413,9 @@
                     <li class="nav-item"><a class="nav-link nav-link-custom active" href="/dialogue"
                             onclick="setActive(this)">电影例句</a>
                     </li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom" href="/feedback"
+                            onclick="setActive(this)">意见反馈</a>
+                    </li>
                 </ul>
             </div>
             <div class="d-none d-lg-block">
@@ -422,6 +425,10 @@
     </nav>
 
     <div class="main-container">
+        <h1 th:if="${isExternal} and ${keyword != null} and ${keyword != ''}" class="page-title"
+            style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 2rem; text-align: center; margin-bottom: 30px; margin-top: 40px; letter-spacing: -0.5px; position: relative; display: inline-block; width: 100%;"
+            th:text="${keyword} + '的电影例句'">
+        </h1>
 
         <form onsubmit="handleSearch(event)" id="searchForm">
             <div class="search-container">

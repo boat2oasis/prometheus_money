@@ -156,7 +156,19 @@ public class FrequencyController {
 			@org.springframework.web.bind.annotation.PathVariable(required = false) String keyword,
 			@org.springframework.web.bind.annotation.RequestParam(value = "keyword", required = false) String reqKeyword,
 			@org.springframework.web.bind.annotation.RequestParam(value = "type", required = false) String reqType,
-			org.springframework.ui.Model model) {
+			org.springframework.ui.Model model,
+			HttpServletRequest request) {
+
+		// Check for external request
+		String referer = request.getHeader("Referer");
+		String serverName = request.getServerName();
+		boolean isExternal = true;
+
+		if (referer != null && referer.contains(serverName)) {
+			isExternal = false;
+		}
+
+		model.addAttribute("isExternal", isExternal);
 
 		if (page == null) {
 			page = 1;

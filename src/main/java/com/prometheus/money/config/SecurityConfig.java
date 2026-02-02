@@ -50,7 +50,8 @@ public class SecurityConfig {
 								"/words/importFile", "/words/import", "/dialogue/list2",
 								"/similarity/caculateSimilarity",
 								"/dialogue", "/dialogue/get", "/dialogue/update", "/dialogue/search", "/thymeleaf", "/",
-								"/english/**", "/css/**", "/image/**", "/frequency/**", "/dialogue/**")
+								"/english/**", "/css/**", "/image/**", "/frequency/**", "/dialogue/**", "/feedback",
+								"/feedback/**")
 						.permitAll().anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class).build();

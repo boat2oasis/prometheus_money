@@ -4,11 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
 
-    <title>高频电影单词查询|COCA单词查询</title>
-    <meta name="description"
-        content="查询电影中最高频的单词，查询COCA语料库中最高频的单词，通过前缀、后缀、词根等条件筛选单词">
+
+    <title th:text="${isExternal ? ((type == 'prefix' or type == 'before') and keyword != null and keyword != '' ? '以 ' + keyword + ' 为前缀的单词，以 ' + keyword + ' 开头的单词' : 
+                      ((type == 'suffix' or type == 'after') and keyword != null and keyword != '' ? '以 ' + keyword + ' 为后缀的单词，以 ' + keyword + ' 结尾的单词' : 
+                      ((type == 'general' or type == 'significant' or type == null) and keyword != null and keyword != '' ? keyword + '的电影词频，' + keyword + '的COCA词频' : 
+                      '高频电影单词查询 - COCA词频查询'))) : '高频电影单词查询|COCA单词查询'}">高频电影单词查询|COCA单词查询</title>
+    <meta name="description" th:content="${isExternal ? ((type == 'prefix' or type == 'before') and keyword != null and keyword != '' ? '以 ' + keyword + ' 为前缀的单词，以 ' + keyword + ' 开头的单词' : 
+                      ((type == 'suffix' or type == 'after') and keyword != null and keyword != '' ? '以 ' + keyword + ' 为后缀的单词，以 ' + keyword + ' 结尾的单词' : 
+                      ((type == 'general' or type == 'significant' or type == null) and keyword != null and keyword != '' ? keyword + '的电影词频，' + keyword + '的COCA词频' : 
+                      '高频电影单词查询 - COCA词频查询'))) : '查询电影中最高频的单词，查询COCA语料库中最高频的单词，通过前缀、后缀、词根等条件筛选单词'}">
 
     <link rel="apple-touch-icon" sizes="180x180" href="/image/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/image/favicon-32x32.png">
@@ -181,15 +186,21 @@
         }
 
         .page-title {
-            color: var(--text-main);
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-            font-size: 2.5rem;
+            font-weight: 800;
+            font-size: 2rem;
             text-align: center;
-            margin-bottom: 10px;
-            margin-top: 30px;
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
+            margin-top: 40px;
             letter-spacing: -0.5px;
+            /* text-shadow: none; remove shadow as it conflicts with gradient text mostly */
+            position: relative;
+            display: inline-block;
+            width: 100%;
         }
 
         .page-subtitle {
@@ -494,6 +505,9 @@
                     <li class="nav-item"><a class="nav-link nav-link-custom" href="/dialogue"
                             onclick="setActive(this)">电影例句</a>
                     </li>
+                    <li class="nav-item"><a class="nav-link nav-link-custom" href="/feedback"
+                            onclick="setActive(this)">意见反馈</a>
+                    </li>
                 </ul>
             </div>
             <div class="d-none d-lg-block">
@@ -503,6 +517,12 @@
     </nav>
 
     <div class="main-container">
+        <h1 th:if="${isExternal}" class="page-title" th:text="${(type == 'prefix' or type == 'before') and keyword != null and keyword != '' ? '以 ' + keyword + ' 为前缀的单词，以 ' + keyword + ' 开头的单词' : 
+                      ((type == 'suffix' or type == 'after') and keyword != null and keyword != '' ? '以 ' + keyword + ' 为后缀的单词，以 ' + keyword + ' 结尾的单词' : 
+                      ((type == 'general' or type == 'significant' or type == null) and keyword != null and keyword != '' ? keyword + '的电影词频，' + keyword + '的COCA词频' : 
+                      '高频电影单词查询 - COCA词频查询'))}">
+            高频电影单词查询 - COCA词频查询
+        </h1>
 
         <form onsubmit="handleSearch(event)" id="searchForm">
             <input type="hidden" name="type" id="typeInput" th:value="${type}">

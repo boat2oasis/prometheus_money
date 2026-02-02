@@ -22,6 +22,7 @@ import org.springframework.data.elasticsearch.core.query.highlight.HighlightFiel
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,13 +73,25 @@ public class DialogueController {
 
 	@GetMapping(value = { "dialogue", "dialogue/{page}/{size}", "dialogue/{page}/{size}/{keyword}" })
 	public String dialogue(Model model,
-			@org.springframework.web.bind.annotation.PathVariable(required = false) Integer page,
-			@org.springframework.web.bind.annotation.PathVariable(required = false) Integer size,
-			@org.springframework.web.bind.annotation.PathVariable(required = false) String keyword,
-			@org.springframework.web.bind.annotation.RequestParam(value = "page", required = false) Integer reqPage,
-			@org.springframework.web.bind.annotation.RequestParam(value = "size", required = false) Integer reqSize,
-			@org.springframework.web.bind.annotation.RequestParam(value = "keyword", required = false) String reqKeyword,
+			@PathVariable(required = false) Integer page,
+			@PathVariable(required = false) Integer size,
+			@PathVariable(required = false) String keyword,
+			@RequestParam(value = "page", required = false) Integer reqPage,
+			@RequestParam(value = "size", required = false) Integer reqSize,
+			@RequestParam(value = "keyword", required = false) String reqKeyword,
+
 			HttpServletRequest request) {
+
+		// Check for external request (SEO)
+		String referer = request.getHeader("Referer");
+		String serverName = request.getServerName();
+		boolean isExternal = true;
+
+		if (referer != null && referer.contains(serverName)) {
+			isExternal = false;
+		}
+
+		model.addAttribute("isExternal", isExternal);
 
 		if (page == null) {
 			page = reqPage != null ? reqPage : 1;

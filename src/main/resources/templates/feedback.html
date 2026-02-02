@@ -25,9 +25,11 @@
             --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             --primary-color: #6366f1;
             --secondary-color: #8b5cf6;
+            --accent-pink: #d93025;
             --bg-body: #f8fafc;
             --text-main: #1e293b;
             --text-secondary: #64748b;
+            --active-tab-bg: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
 
             /* Glassmorphism Variables */
             --glass-bg: rgba(255, 255, 255, 0.7);
@@ -35,12 +37,11 @@
             --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
             --glass-blur: blur(12px);
 
-            /* Shadows */
-            --shadow-float: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        html {
-            overflow-y: scroll;
+            /* Shadows for depth */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            --shadow-floating: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
         }
 
         body {
@@ -50,11 +51,15 @@
                 radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
                 radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
             color: var(--text-main);
-            min-height: 100vh;
             padding-bottom: 80px;
+            min-height: 100vh;
         }
 
-        /* 顶部背景图 */
+html {
+    scrollbar-gutter: stable;
+}
+
+        /* 顶部背景图 - Modern Curved Header */
         .header-bg {
             background: var(--primary-gradient);
             height: 380px;
@@ -69,6 +74,7 @@
             box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
         }
 
+        /* Decorative circles in header */
         .header-bg::before,
         .header-bg::after {
             content: '';
@@ -91,12 +97,13 @@
             right: -100px;
         }
 
-        /* 导航栏 */
+        /* 导航栏样式 */
         .navbar-sticky {
             position: sticky;
             top: 0;
             z-index: 1000;
             padding: 15px 0;
+            transition: all 0.3s ease;
         }
 
         .navbar-custom {
@@ -107,7 +114,7 @@
         }
 
         .nav-link-custom {
-            color: var(--text-main) !important;
+            color: rgba(255, 255, 255, 0.8) !important;
             font-weight: 700;
             font-size: 1rem;
             margin: 0 10px;
@@ -116,15 +123,53 @@
             transition: all 0.3s ease;
         }
 
+        .navbar-custom .nav-link-custom {
+            color: var(--text-main) !important;
+        }
+
         .nav-link-custom:hover {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-custom .nav-link-custom:hover {
             color: var(--primary-color) !important;
             background: rgba(99, 102, 241, 0.1);
         }
 
         .nav-link-custom.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff !important;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-custom .nav-link-custom.active {
             background: var(--primary-gradient);
             color: #fff !important;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .nav-link-custom::after {
+            display: none;
+        }
+
+        .navbar-brand-custom {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #fff !important;
+        }
+
+        .navbar-custom .navbar-brand-custom {
+            color: var(--primary-color) !important;
+        }
+
+        @media (min-width: 992px) {
+            .navbar-nav .nav-item:first-child .nav-link-custom {
+                margin-left: 0;
+                padding-left: 0;
+            }
         }
 
         /* 主容器 */

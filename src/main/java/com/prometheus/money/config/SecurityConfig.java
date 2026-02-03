@@ -51,7 +51,7 @@ public class SecurityConfig {
 								"/similarity/caculateSimilarity",
 								"/dialogue", "/dialogue/get", "/dialogue/update", "/dialogue/search", "/thymeleaf", "/",
 								"/english/**", "/css/**", "/image/**", "/frequency/**", "/dialogue/**", "/feedback",
-								"/feedback/**")
+								"/feedback/**", "/ads.txt", "/googlebbcb0bc8667c8a65.html")
 						.permitAll().anyRequest().authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class).build();
